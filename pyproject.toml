@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "MyTimer"
+version = "0.1.0"
+description = ""
+authors = ["IvanovIvan1900 <ivanovivan159753@yandex.ru>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Django = "3.2.10"
+django-debugtools = "^2.0"
+django-debug-toolbar = "^3.2.4"
+django-bootstrap4 = "^21.2"
+django-jazzmin = "^2.4.8"
+django-environ = "^0.8.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

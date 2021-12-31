@@ -1,0 +1,11 @@
+.venv/
+**__pycache__/
+secret_data.py
+poetry.lock
+launch.json
+bboard.data
+**thumbnails/**
+*.log
+bd.sqlite3
+**migrations**
+.env

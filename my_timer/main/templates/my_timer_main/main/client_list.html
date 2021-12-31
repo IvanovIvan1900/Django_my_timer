@@ -1,0 +1,36 @@
+{% extends "my_timer_main/layout/basic.html" %}
+{% load bootstrap4 %}
+{% block title %}Клиенты{% endblock %}
+{% block content %}
+<div class="row">
+</div>
+<div class="row">
+    <table class="table table-hover table table-striped table-hover">
+        <thead>
+            <tr>
+              <th scope="col" style="width: 5%;">Активный</th>
+              <th scope="col" style="width: 35%;">Имя</th>
+              <th scope="col" style="width: 50%;">Полное имя</th>
+              <th scope="col" style="width: 10%;">Удалить</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if clients %}
+            {% for client in clients %}
+            <tr>
+              {% if client.is_active %}
+                <td align="center"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1" checked disabled></td>
+              {% else %}
+                <td align="center"><input class="form-check-input" type="checkbox" value="" id="defaultCheck2" disabled></td>
+            {% endif%}
+              <td><a href="{% url 'my_timer:client_edit' client_id=client.pk %}">{{ client.name }}</td>
+              <td>{{ client.full_name}}</td>
+              <td><a href="#">"Удалить"</td>
+              </tr>
+            {% endfor %}
+            {% endif %}
+          </tbody>
+    </table>
+</div>
+
+{% endblock %}
