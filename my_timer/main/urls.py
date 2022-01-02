@@ -8,6 +8,7 @@ from .views import client_edit_or_add
 from .views import client_delete
 # from .views import cleint_filter
 from . import views
+from .views import task_list, task_edit_or_add, task_delete
 
 app_name = "my_timer"
 
@@ -19,6 +20,10 @@ urlpatterns = [
     path('client_delete/<int:client_id>/', client_delete, name = 'client_delete'),
     path('client_add/', client_edit_or_add, name = 'client_add'),
     path('client_list/', client_list, name = 'client_list'),
+    path('task_edit/<int:task_id>/', task_edit_or_add, name = 'task_edit'),
+    path('task_delete/<int:task_id>/', task_delete, name = 'task_delete'),
+    path('task_add/', task_edit_or_add, name = 'task_add'),
+    path('task_list/', task_list, name = 'task_list'),
 ]
 
 if settings.DEBUG:

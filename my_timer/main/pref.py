@@ -1,13 +1,15 @@
 
 class Pref:
-    dic_of_pref = {'client_count_item_on_page':2}
+    dic_of_pref = {'client_count_item_on_page':50,
+    'task_count_item_on_page':50,
+    }
     
     @classmethod
     def get_pref_by_name(cls, pref_name, default_value):
         """Возвращает настройку по имени.
 
         Args:
-            pref_name ([type]): Имя настройки ('client_count_item_on_page', )
+            pref_name ([type]): Имя настройки ('client_count_item_on_page', 'task_count_item_on_page')
             default_value ([type]): Значение по умолчанию
 
         Returns:

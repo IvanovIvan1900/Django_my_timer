@@ -10,13 +10,14 @@ class Clients(models.Model):
     is_active = models.BooleanField(verbose_name= 'Активный', db_index= True)
     user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.PROTECT)
 
-    def __str__(self):
-        return self.name
 
     class Meta:
         verbose_name_plural = 'Клиенты'
         verbose_name = 'Клиент'
         ordering = ['-name']
+
+    def __str__(self):
+        return self.name
 
 class Tasks(models.Model):
     name = models.CharField(max_length=50, db_index=True, unique=True,
@@ -32,6 +33,9 @@ class Tasks(models.Model):
         verbose_name_plural = 'Задачи'
         verbose_name = 'Задача'
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.name} ({self.client.name})'
 
 class TimeTrack(models.Model):
     task = models.ForeignKey(Tasks, on_delete=models.CASCADE,
