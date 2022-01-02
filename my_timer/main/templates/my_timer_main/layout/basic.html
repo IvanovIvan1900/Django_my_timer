@@ -17,21 +17,27 @@
         <h1 class="display-1 text-center">Тайм трекер</h1>
     </header>
     <div class="row">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Клиенты</a>
-            <a class="navbar-brand" href="#">Задачи</a>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Отчет
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="#">Отчет 1</a>
-                  <a class="dropdown-item" href="#">Отчет 2</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Отчет 3</a>
-                </div>
-              </li>
-        </nav>
+        <div class="col">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="{% url 'my_timer:client_list' %}">Клиенты</a>
+                <a class="navbar-brand" href="#">Задачи</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Отчет
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">Отчет 1</a>
+                    <a class="dropdown-item" href="#">Отчет 2</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Отчет 3</a>
+                    </div>
+                </li>
+            </nav>
+        </div>
+        <div class="col">
+            {% block menu_block %}
+            {% endblock %}
+        </div>
     </div>
     <div class="row">
         <section class="col border py-2">

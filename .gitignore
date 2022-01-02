@@ -6,6 +6,6 @@ launch.json
 bboard.data
 **thumbnails/**
 *.log
-bd.sqlite3
 **migrations**
 .env
+my_timer/db.sqlite3
