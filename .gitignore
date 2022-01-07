@@ -8,4 +8,4 @@ bboard.data
 *.log
 **migrations**
 .env
-my_timer/db.sqlite3
+**.sqlite3

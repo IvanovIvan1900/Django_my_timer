@@ -1,0 +1,55 @@
+{% extends "my_timer_main/layout/basic.html" %}
+{% load bootstrap4 %}
+{% block title %}Клиенты{% endblock %}
+{%block menu_block%}
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
+  <a class="navbar-brand" href="{% url 'my_timer:time_track_add' %}">Добавить тайм трек</a>
+    <div class="row">
+    <form class="col-md-auto form-inline">
+    {% bootstrap_form form_search show_label=False %}
+    {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
+    {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
+    </form>
+    </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="row">
+</div>
+<div class="row">
+    <table class="table table-hover table table-striped table-hover">
+        <thead>
+            <tr>
+              <th scope="col" style="width: 5%;">Активная</th>
+              <th scope="col" style="width: 35%;">Имя задачи</th>
+              <th scope="col" style="width: 20%;">Имя клиента</th>
+              <th scope="col" style="width: 5%;">Дата начала</th>
+              <th scope="col" style="width: 5%;">Дата окончания</th>
+              <th scope="col" style="width: 5%;">Время работы</th>
+              <th scope="col" style="width: 5%;">Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if time_trackers %}
+            {% for time_track in time_trackers %}
+            <tr>
+              {% if time_track.is_active %}
+                <td align="center"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1" checked disabled></td>
+              {% else %}
+                <td align="center"><input class="form-check-input" type="checkbox" value="" id="defaultCheck2" disabled></td>
+            {% endif%}
+              <td><a href="{% url 'my_timer:task_edit' task_id=time_track.task.pk %}">{{ time_track.task.name }}</td>
+              <td><a href="{% url 'my_timer:client_edit' client_id=time_track.task.client.pk %}">{{ time_track.task.client.name}}</td>
+              <td>{{time_track.date_start|date:'d-m  H:i'}} </td>
+              <td>{{time_track.date_stop|date:'d-m  H:i'}} </td>
+              <td>{{time_track.duration_sec}} </td>
+              <td><a href="{% url 'my_timer:time_track_edit' time_track_id=time_track.pk%}"><img src="{% static 'main/ico_edit.png' %}"
+                width="18" height="18" alt="Редактировать"></a></td>
+              </tr>
+            {% endfor %}
+            {% endif %}
+          </tbody>
+    </table>
+</div>
+{% endblock %}
