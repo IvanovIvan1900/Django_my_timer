@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from .views import client_list
 from django.conf import settings 
 from django.views.decorators.cache import never_cache
@@ -32,6 +32,8 @@ urlpatterns = [
     path('time_track_edit/<int:time_track_id>/', time_track_edit_or_add, name = 'time_track_edit'),
     path('time_track_add/', time_track_edit_or_add, name = 'time_track_add'),
     path('action_wich_taks/<str:action>/<int:id>', action_wich_tasks, name = 'action_wich_tasks'),
+    # path(r'^select2/', include('select2.urls')),
+    path("select2/", include("django_select2.urls")),
 ]
 
 if settings.DEBUG:

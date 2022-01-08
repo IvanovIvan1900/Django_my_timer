@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models import signals
 from datetime import datetime as dt
 from django.utils import timezone as tz
+from .utility import clear_cache_client, active_task_cache_client
 # Create your models here.
 
 class Clients(models.Model):
@@ -17,6 +18,10 @@ class Clients(models.Model):
         verbose_name_plural = 'Клиенты'
         verbose_name = 'Клиент'
         ordering = ['-name']
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        clear_cache_client()
 
     def __str__(self):
         return self.name
@@ -35,6 +40,10 @@ class Tasks(models.Model):
         verbose_name = 'Задача'
         ordering = ['-created_at']
         unique_together = ('name', 'client')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        active_task_cache_client()
 
     def __str__(self):
         return f'{self.name} ({self.client.name})'

@@ -1,6 +1,20 @@
 {% extends "my_timer_main/layout/basic.html" %}
 {% load bootstrap4 %}
 {% block title %}Рабочее место{% endblock %}
+{%block head %}
+    {# Include FontAwesome; required for icon display #}
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
+
+    {# Include Bootstrap 4 and jQuery #}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    {# Django Tempus Dominus assets are included in `{{ form.media }}` #}
+    {{ form_test.media }}
+    {% comment %} {{ form_test.media.css }} {% endcomment %}
+
+{% endblock %}
 {%block menu_block%}
 {% load static %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
@@ -16,7 +30,15 @@
 </nav>
 {% endblock %}
 {% block content %}
-<div >
+<div>
+  <form class="col-md-auto form-inline" method="post">
+    {% csrf_token %}
+    {% bootstrap_form form_test show_label=True %}
+    {% bootstrap_button  button_class="btn btn-outline-success" content='Тест' button_type='submit' name="add_button" value="search" %}
+    {% comment %} {{ form_test.media.js }} {% endcomment %}
+  </form>
+</div>
+<div>
 {% if active_time_treket %}
   <fieldset>
   <legend >Активные задачи</legend>

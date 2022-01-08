@@ -65,6 +65,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debugtools',
     "debug_toolbar",
+    "django_select2",
+    'tempus_dominus',
 ]
 
 MIDDLEWARE = [
@@ -131,7 +133,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache1',
+    },
+    'mem_cache': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'cache2',
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -149,6 +160,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'/my_timer/static/')
+TEMPUS_DOMINUS_LOCALIZE = True
+TEMPUS_DOMINUS_INCLUDE_ASSETS = True
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

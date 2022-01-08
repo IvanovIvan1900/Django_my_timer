@@ -17,6 +17,7 @@ from .forms import FormNewTask
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import get_current_timezone
 from .forms import FromChangeTimeTracker
+from .forms import FormTestWidget
 
 # Create your views here.
 def client_list(request):
@@ -61,7 +62,8 @@ def client_edit_or_add(request, client_id = ""):
             # redirect to a new URL:
             form.save(commit=True)
             return HttpResponseRedirect(reverse('my_timer:client_list'))
-
+        else:
+            return render(request, 'my_timer_main/main/client_edit.html', {'form': form})            
     # if a GET (or any other method) we'll create a blank form
     else:
         if client:
@@ -110,7 +112,7 @@ def task_edit_or_add(request, task_id = ""):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         if task:
-            form = FormCha(request.POST, instance=task)
+            form = FormChangeTask(request.POST, instance=task)
         else:
             form = FormChangeTask(request.POST)
         # check whether it's valid:
@@ -185,12 +187,12 @@ def work_place(request):
     
     message = ""
     
-    if request.method == 'POST':
+    if request.method == 'POST' and request.POST.get('task') is not None:
         task_to_start = None
         task_name = request.POST.get('task')
         client_id = request.POST.get('client')
         client = Clients.objects.get(pk = client_id)
-        task = Tasks.objects.filter(name__icontains=task_name, client=client)
+        task = Tasks.objects.filter(name__icontains=task_name, client=client).all()
         if task.count() == 1:
             task_to_start = task[0]
         elif task.count() > 1:
@@ -208,8 +210,9 @@ def work_place(request):
     keyword  = ''
     form_search = SearchForm(initial={'keyword': keyword})
     form_new_task = FormNewTask()
+    form_test = FormTestWidget()
     context = {'array_dic_of_data_last_tasks': array_dic_of_data_last_tasks,'form_search':form_search, 'active_time_treket':active_time_treket,
-            'form_new_task':form_new_task ,}
+            'form_new_task':form_new_task , 'form_test':form_test}
     return render(request, 'my_timer_main/main/work_place.html', context)
 
 def action_wich_tasks(request, action, id):
