@@ -1,0 +1,17 @@
+{% extends "my_timer_main/layout/basic.html" %}
+{% load bootstrap4 %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<h2>Вход</h2>
+{% if user.is_authenticated %}
+<p>Вы уже выполнили вход.</p>
+{% else %}
+<form class="col-md-auto" method="post">
+    {% csrf_token %}
+    {% bootstrap_form form show_label=True %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% bootstrap_button  button_class="btn btn-outline-success" content='Войти' button_type='submit' name="add_button" value="search" %}
+ </form>
+
+{% endif %}
+{% endblock %}
