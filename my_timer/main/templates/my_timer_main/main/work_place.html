@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     {# Django Tempus Dominus assets are included in `{{ form.media }}` #}
-    {{ form_test.media }}
+    {{ form_new_task.media }}
     {% comment %} {{ form_test.media.css }} {% endcomment %}
 
 {% endblock %}
@@ -30,14 +30,6 @@
 </nav>
 {% endblock %}
 {% block content %}
-<div>
-  <form class="col-md-auto form-inline" method="post">
-    {% csrf_token %}
-    {% bootstrap_form form_test show_label=True %}
-    {% bootstrap_button  button_class="btn btn-outline-success" content='Тест' button_type='submit' name="add_button" value="search" %}
-    {% comment %} {{ form_test.media.js }} {% endcomment %}
-  </form>
-</div>
 <div>
 {% if active_time_treket %}
   <fieldset>

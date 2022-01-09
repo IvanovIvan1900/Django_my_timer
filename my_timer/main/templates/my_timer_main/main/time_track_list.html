@@ -1,20 +1,42 @@
 {% extends "my_timer_main/layout/basic.html" %}
 {% load bootstrap4 %}
 {% block title %}Клиенты{% endblock %}
+{%block head %}
+    {# Include FontAwesome; required for icon display #}
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
+
+    {# Include Bootstrap 4 and jQuery #}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    {# Django Tempus Dominus assets are included in `{{ form.media }}` #}
+    {{ form_search.media }}
+    {% comment %} {{ form_test.media.css }} {% endcomment %}
+
+{% endblock %}
 {%block menu_block%}
 {% load static %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
   <a class="navbar-brand" href="{% url 'my_timer:time_track_add' %}">Добавить тайм трек</a>
     <div class="row">
-    <form class="col-md-auto form-inline">
+    {% comment %} <form class="col-md-auto form-inline">
     {% bootstrap_form form_search show_label=False %}
     {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
     {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
-    </form>
+    </form> {% endcomment %}
     </div>
 </nav>
 {% endblock %}
 {% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
+  <div class="row">
+  <form class="col-md-auto form-inline">
+  {% bootstrap_form form_search %}
+  {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
+  {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
+  </form>
+</nav>
 <div class="row">
 </div>
 <div class="row">

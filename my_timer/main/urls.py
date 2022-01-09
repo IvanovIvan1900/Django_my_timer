@@ -11,12 +11,12 @@ from .views import task_list, task_edit_or_add, task_delete
 from .views import work_place
 from .views import action_wich_tasks
 from .views import time_track_list, time_track_edit_or_add
-
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 
 app_name = "my_timer"
 
 urlpatterns = [
-    path('', views.client_list, name='index'),
+    path('', LoginView.as_view(), name='index'),
     # path(r'^user\/(?P<username>\w{0,50})', cleint_filter, name = 'cleint_filter'),
     # path('cleint_filter/<str:filter_text>/', cleint_filter, name = 'cleint_filter'),
     path('client_edit/<int:client_id>/', client_edit_or_add, name = 'client_edit'),
@@ -34,6 +34,11 @@ urlpatterns = [
     path('action_wich_taks/<str:action>/<int:id>', action_wich_tasks, name = 'action_wich_tasks'),
     # path(r'^select2/', include('select2.urls')),
     path("select2/", include("django_select2.urls")),
+    path('accounts/login/', LoginView.as_view(), name='login'),
+    path('accounts/logout/', LogoutView.as_view(next_page='my_timer:login'), name='logout'),
+    path('accounts/password/change/', PasswordChangeView.as_view(template_name='registration/change_password.html'),
+        name='password_change'),
+
 ]
 
 if settings.DEBUG:

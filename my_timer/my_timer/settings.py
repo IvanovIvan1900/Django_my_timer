@@ -162,7 +162,57 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR,'/my_timer/static/')
 TEMPUS_DOMINUS_LOCALIZE = True
 TEMPUS_DOMINUS_INCLUDE_ASSETS = True
+LOGIN_REDIRECT_URL = 'my_timer:work_place'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    "root": {"level": "INFO", "handlers": ["file"]},
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters': {
+        'simple': {
+            'format': '[%(asctime)s] %(levelname)s: %(message)s',
+            'datefmt': '%Y.%m.%d %H:%M:%S',
+        }
+    },
+    'handlers': {
+        'console_dev': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'filters': ['require_debug_true'],
+        },
+        'console_prod': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR,'django-site.log'),
+            'maxBytes': 1048576,
+            'backupCount': 10,
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console_dev', 'console_prod'],
+        },
+        'django.server': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
+}

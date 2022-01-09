@@ -8,44 +8,8 @@ from django_select2 import forms as s2forms
 from .utility import get_qery_client_wich_cahce, get_qery_active_task_wich_cahce
 from tempus_dominus.widgets import DatePicker
 
-class FormChangeClient(forms.ModelForm):
-    class Meta:
-        model = Clients
-        fields = ['name', 'full_name', 'is_active', 'user']
-        # exclude = ['user']
-        widgets = {'user': forms.HiddenInput}
-
-class SearchForm(forms.Form):
-    keyword = forms.CharField(required=False, max_length=30, label='')
-
-class FormChangeTask(forms.ModelForm):
-    class Meta:
-        model = Tasks
-        fields = ['name', 'client', 'is_active', 'user', 'description']
-        # exclude = ['user']
-        widgets = {'user': forms.HiddenInput}
-
-class FormNewTask(forms.Form):
-    task = forms.CharField(required=True, max_length=100, label='Наименование задачи')
-    client = forms.ModelChoiceField(queryset= Clients.objects.all(), required=True, label='Клиент')
-
-class FromChangeTimeTracker(forms.ModelForm):
-    class Meta:
-        model = TimeTrack
-        fields = ['task', 'date_start', 'date_stop', 'duration_sec', 'is_active', 'user']
-        # exclude = ['user']
-        widgets = {'user': forms.HiddenInput}
-
-# class ClientWidget(s2forms.ModelSelect2Widget):
-#     search_fields = [
-#         "name__icontains",
-#         "full_name_icontains",
-#     ]
-
-    # def get_queryset(self):
-    #     # original qs
-    #     qs = super().get_queryset()
-    #     return qs.filter(name__startswith=self.kwargs['name'])
+#=================================================
+#+++++++++++++MY WIDHET++++++++++++++++++++++++++
 class ClientWidget(s2forms.ModelSelect2Widget):
     search_fields = [
         "name__icontains",
@@ -70,6 +34,63 @@ class ClientWidget(s2forms.ModelSelect2Widget):
     def get_queryset(self):
         return get_qery_client_wich_cahce(Clients)
 
+class DAV_DataFieldWidget(DatePicker):
+    dav_options={'buttons':{'showToday':True, 'showClear':True, 'showClose':True}}
+    def __init__(self, attrs=None, options=None, format=None):
+        if isinstance(options , dict):
+            options = {**options, **self.dav_options}
+        else:
+            options = self.dav_options
+        super().__init__(attrs=attrs, options=options, format=format)
+
+#-------------MY WIDHET--------------------------
+#=================================================
+
+class FormChangeClient(forms.ModelForm):
+    class Meta:
+        model = Clients
+        fields = ['name', 'full_name', 'is_active', 'user']
+        # exclude = ['user']
+        widgets = {'user': forms.HiddenInput}
+
+class SearchForm(forms.Form):
+    keyword = forms.CharField(required=False, max_length=30, label='')
+
+class FormChangeTask(forms.ModelForm):
+    class Meta:
+        model = Tasks
+        fields = ['name', 'client', 'is_active', 'user', 'description']
+        # exclude = ['user']
+        widgets = {'user': forms.HiddenInput}
+
+class FormNewTask(forms.Form):
+    task = forms.CharField(required=True, max_length=100, label='Задача')
+    # client = forms.ModelChoiceField(queryset= Clients.objects.all(), required=True, label='Клиент')
+    client = forms.ChoiceField(widget=ClientWidget(), required=True, label='Клиент')
+
+class FromChangeTimeTracker(forms.ModelForm):
+    class Meta:
+        model = TimeTrack
+        fields = ['task', 'date_start', 'date_stop', 'duration_sec', 'is_active', 'user']
+        # exclude = ['user']
+        widgets = {'user': forms.HiddenInput}
+
+class FormTameTrackerFilter(forms.Form):
+    date_from = forms.DateField(widget=DAV_DataFieldWidget(), label="C", required= False)
+    date_to = forms.DateField(widget=DAV_DataFieldWidget(), label="По", required= False)
+    task_name = forms.CharField(max_length=100, label='Задача', required= False)
+    client = forms.ChoiceField(widget=ClientWidget(), label='Клиент', required= False)
+
+# class ClientWidget(s2forms.ModelSelect2Widget):
+#     search_fields = [
+#         "name__icontains",
+#         "full_name_icontains",
+#     ]
+
+    # def get_queryset(self):
+    #     # original qs
+    #     qs = super().get_queryset()
+    #     return qs.filter(name__startswith=self.kwargs['name'])
 # class TaskWidget(s2forms.Select2Mixin):
 #     search_fields = [
 #         "name__icontains",
@@ -119,5 +140,5 @@ class FormTestWidget(forms.Form):
     # list_of_client = ((client.id, client.name) for client in  Clients.objects.all())
     # task = forms.CharField(max_length=250, widget=TaskWidget())
     #https://pypi.org/project/django-tempus-dominus/
-    date_field = forms.DateField(widget=DatePicker(options={'buttons':{'showToday':True, 'showClear':True, 'showClose':True}}))
+    date_field = forms.DateField(widget=DAV_DataFieldWidget())
     client = forms.ChoiceField(widget=ClientWidget())

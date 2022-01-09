@@ -1,3 +1,4 @@
+import pytz
 from django.shortcuts import render
 from .models import Clients, Tasks
 from .forms import FormChangeClient
@@ -17,9 +18,14 @@ from .forms import FormNewTask
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import get_current_timezone
 from .forms import FromChangeTimeTracker
-from .forms import FormTestWidget
+# from .forms import FormTestWidget
+from django.contrib.auth.decorators import login_required
+from .forms import FormTameTrackerFilter
+from django.core.cache import caches
+from .utility import date_convert_from_string, date_end_of_day
 
 # Create your views here.
+@login_required
 def client_list(request):
     keyword = request.GET.get('keyword', '')
     type_of_filter = request.GET.get('search_button', "")
@@ -45,10 +51,10 @@ def client_list(request):
     context = {'clients': page.object_list, 'form_search':form_search, 'page':page}
     return render(request, 'my_timer_main/main/client_list.html', context)
 
+@login_required
 def client_edit_or_add(request, client_id = ""):
     client = None
-    if client_id:
-        client = get_object_or_404(Clients, pk=client_id)
+    iclient = get_object_or_404(Clients, pk=client_id) if client_id else None
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         if client:
@@ -74,12 +80,13 @@ def client_edit_or_add(request, client_id = ""):
 
     return render(request, 'my_timer_main/main/client_edit.html', {'form': form})
 
+@login_required
 def client_delete(request, client_id = ""):
     client = get_object_or_404(Clients, pk=client_id)
     client.delete()
     return HttpResponseRedirect(reverse('my_timer:client_list'))
 
-
+@login_required
 def task_list(request):
     keyword = request.GET.get('keyword', '')
     type_of_filter = request.GET.get('search_button', "")
@@ -92,9 +99,9 @@ def task_list(request):
         q = Q(name__icontains = tasks_filter.strip()) | \
             Q(client__name__icontains = tasks_filter.strip())
         # q = Q(name__icontains = client_filter.strip())
-        tasks = Tasks.objects.filter(q).all()
+        tasks = Tasks.objects.filter(q).select_related().all()
     else:
-        tasks = Tasks.objects.all()
+        tasks = Tasks.objects.select_related().all()
     paginator = Paginator(tasks, Pref.get_pref_by_name('task_count_item_on_page', 10))
     if 'page' in request.GET:
         page_num = request.GET['page']
@@ -105,6 +112,7 @@ def task_list(request):
     context = {'tasks': page.object_list, 'form_search':form_search, 'page':page}
     return render(request, 'my_timer_main/main/task_list.html', context)
 
+@login_required
 def task_edit_or_add(request, task_id = ""):
     task = None
     if task_id:
@@ -133,13 +141,13 @@ def task_edit_or_add(request, task_id = ""):
 
     return render(request, 'my_timer_main/main/task_edit.html', {'form': form})
 
+@login_required
 def task_delete(request, task_id):
     task = get_object_or_404(Tasks, pk=task_id)
     task.delete()
     return HttpResponseRedirect(reverse('my_timer:task_list'))
 
-
-
+@login_required
 def work_place(request):
     # last_tasks = Tasks.objects.
     def dictfetchall(cursor):
@@ -178,10 +186,11 @@ def work_place(request):
             # разницу рассчитаем вручную, т.к.в разных типах БД разные функции
             for elem in dic_of_data:
                 elem['diff_day'] = ''
-                max_date = parse_datetime(elem['max_date'])
-                max_date = max_date.replace(tzinfo=tz_curr)
-                if max_date:
-                    elem['diff_day'] = (tz.now().date() - max_date.date()).days
+                if elem['max_date'] is not None:
+                    max_date = parse_datetime(elem['max_date'])
+                    max_date = max_date.replace(tzinfo=tz_curr)
+                    if max_date:
+                        elem['diff_day'] = (tz.now().date() - max_date.date()).days
                 
         return dic_of_data
     
@@ -210,11 +219,12 @@ def work_place(request):
     keyword  = ''
     form_search = SearchForm(initial={'keyword': keyword})
     form_new_task = FormNewTask()
-    form_test = FormTestWidget()
+    # form_test = FormTestWidget()
     context = {'array_dic_of_data_last_tasks': array_dic_of_data_last_tasks,'form_search':form_search, 'active_time_treket':active_time_treket,
-            'form_new_task':form_new_task , 'form_test':form_test}
+            'form_new_task':form_new_task}
     return render(request, 'my_timer_main/main/work_place.html', context)
 
+@login_required
 def action_wich_tasks(request, action, id):
     """Выполняет действия с задачей
 
@@ -241,33 +251,60 @@ def action_wich_tasks(request, action, id):
 #     request.session['client_filter'] = filter_text
 #     return HttpResponseRedirect(reverse('my_timer:client_list'))
 
+@login_required
 def time_track_list(request):
-    keyword = ''
-    # keyword = request.GET.get('keyword', '')
-    # type_of_filter = request.GET.get('search_button', "")
-    # if type_of_filter == "clear_search":
-    #     keyword = ''
-    # request.session['client_filter'] = keyword
-    # client_filter = request.session.get('client_filter', "")
-    # if client_filter:
-    #     #icontains not workin for sqlite
-    #     q = Q(name__icontains = client_filter.strip()) | \
-    #         Q(full_name__icontains = client_filter.strip())
-    #     # q = Q(name__icontains = client_filter.strip())
-    #     clients = Clients.objects.filter(q).all()
-    # else:
-    #     clients = Clients.objects.all()
-    # paginator = Paginator(clients, Pref.get_pref_by_name('client_count_item_on_page', 10))
-    # if 'page' in request.GET:
-    #     page_num = request.GET['page']
-    # else:
-    #     page_num = 1
-    # page = paginator.get_page(page_num)
-    time_trackers = TimeTrack.objects.all()
-    form_search = SearchForm(initial={'keyword': keyword})
+    cache_key_filter = 'time_track_list_cache_filter'
+    timeout_cache = None
+    filter_list = ['date_from', 'date_to', 'task_name', 'client']
+    type_of_filter = request.GET.get('search_button', "")
+    if type_of_filter:
+        if type_of_filter == 'clear_search':
+            dic_of_filter = dict.fromkeys(filter_list)
+        else:
+            dic_of_filter = {key: request.GET.get(key, None) for key in filter_list}
+        caches['mem_cache'].set(cache_key_filter, dic_of_filter, timeout=timeout_cache)
+    else:
+        dic_of_filter = caches['mem_cache'].get(cache_key_filter, None)
+        if dic_of_filter is None:
+            dic_of_filter = dict.fromkeys(filter_list)
+            caches['mem_cache'].set(cache_key_filter, dic_of_filter, timeout=timeout_cache)
+
+    array_list_of_q = []
+    for key, value in dic_of_filter.items():
+        if value is not None:
+            if key == "date_from" and dic_of_filter[key]:
+                dic_of_filter[key] = date_convert_from_string(value)
+                # array_list_of_q.append(Q(date_stop__gte=dic_of_filter[key].astimezone(pytz.UTC)))
+                array_list_of_q.append(Q(date_stop__gte=dic_of_filter[key]))
+            elif key == "date_to" and dic_of_filter[key]:
+                dic_of_filter[key] = date_end_of_day(date_convert_from_string(value))
+                array_list_of_q.append(Q(date_stop__lte=dic_of_filter[key]))
+            elif key == "task_name":
+                array_list_of_q.append(Q(task__name__icontains=value))
+            elif key == "client" and dic_of_filter[key]:
+                dic_of_filter[key] = get_object_or_404(Clients, pk=value)
+                array_list_of_q.append(Q(task__client=dic_of_filter[key]))
+                dic_of_filter[key] = Clients.id
+    q = None
+    if len(array_list_of_q):
+        for q_ in array_list_of_q:
+            if q is None:
+                q = q_
+            else:
+                q = q_ & q
+    if q is not None:
+        time_trackers = TimeTrack.objects.select_related().filter(q).all()
+    else:
+        time_trackers = TimeTrack.objects.select_related().all()
+
+    initial_dic = {key: value for (key, value) in dic_of_filter.items() if value and value is not None}
+    form_search = FormTameTrackerFilter(initial=initial_dic)
+    # if initial_dic.get('client'):
+    #     form_search.fields['client'].initial = initial_dic['client'].id
     context = {'time_trackers': time_trackers, 'form_search':form_search, }
     return render(request, 'my_timer_main/main/time_track_list.html', context)
 
+@login_required
 def time_track_edit_or_add(request, time_track_id = ""):
     time_track = None
     if time_track_id:
