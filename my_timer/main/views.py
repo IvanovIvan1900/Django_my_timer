@@ -284,7 +284,7 @@ def time_track_list(request):
             elif key == "client" and dic_of_filter[key]:
                 dic_of_filter[key] = get_object_or_404(Clients, pk=value)
                 array_list_of_q.append(Q(task__client=dic_of_filter[key]))
-                dic_of_filter[key] = Clients.id
+                # dic_of_filter[key] = Clients.id
     q = None
     if len(array_list_of_q):
         for q_ in array_list_of_q:
@@ -300,7 +300,7 @@ def time_track_list(request):
     initial_dic = {key: value for (key, value) in dic_of_filter.items() if value and value is not None}
     form_search = FormTameTrackerFilter(initial=initial_dic)
     # if initial_dic.get('client'):
-    #     form_search.fields['client'].initial = initial_dic['client'].id
+    #     form_search.fields['client'].choices = Clients.objects.get(pk=2)
     context = {'time_trackers': time_trackers, 'form_search':form_search, }
     return render(request, 'my_timer_main/main/time_track_list.html', context)
 

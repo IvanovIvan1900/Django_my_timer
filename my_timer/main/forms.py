@@ -79,7 +79,8 @@ class FormTameTrackerFilter(forms.Form):
     date_from = forms.DateField(widget=DAV_DataFieldWidget(), label="C", required= False)
     date_to = forms.DateField(widget=DAV_DataFieldWidget(), label="По", required= False)
     task_name = forms.CharField(max_length=100, label='Задача', required= False)
-    client = forms.ChoiceField(widget=ClientWidget(), label='Клиент', required= False)
+    client = forms.ModelChoiceField(queryset=get_qery_client_wich_cahce(Clients), widget=ClientWidget(), label='Клиент', required= False)
+    # client = forms.ModelChoiceField(queryset=Clients.objects.all(), label='Клиент', required= False)
 
 # class ClientWidget(s2forms.ModelSelect2Widget):
 #     search_fields = [
