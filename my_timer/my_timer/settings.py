@@ -107,10 +107,22 @@ WSGI_APPLICATION = 'my_timer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+# start postgres
+# docker-compose -f /run/media/dav/share_win_linux/Pythow_Work_Dir/LearnProject/Django/MyTimer/docker-compose_postgres.yml  up 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'my_timer',
+        'USER': 'my_timer',
+        'PASSWORD': 'pgpwd4habr',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
@@ -181,7 +193,7 @@ LOGGING = {
     },
     'formatters': {
         'simple': {
-            'format': '[%(asctime)s] %(levelname)s: %(message)s',
+            'format': '[%(asctime)s]--%(name)s-- %(levelname)s: %(message)s',
             'datefmt': '%Y.%m.%d %H:%M:%S',
         }
     },

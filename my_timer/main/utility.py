@@ -5,8 +5,8 @@ from django.utils import timezone as tz
 from django.utils.timezone import get_current_timezone, make_aware
 import logging
 
-logger = logging.getLogger(__name__)
-
+logger = logging.getLogger(f'django.{__name__}')
+# logger.error('test logger')
 def get_qery_client_wich_cahce(class_model):
     cache_qery_key = "client_qery_cache"
     if caches['mem_cache'].has_key(cache_qery_key):

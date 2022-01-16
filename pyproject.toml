@@ -14,6 +14,7 @@ django-jazzmin = "^2.4.8"
 django-environ = "^0.8.1"
 django-select2 = "^7.9.0"
 django-tempus-dominus = "^5.1.2"
+psycopg2-binary = "^2.9.3"
 
 [tool.poetry.dev-dependencies]
 
