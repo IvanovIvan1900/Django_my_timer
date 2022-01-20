@@ -1,5 +1,6 @@
 {% extends "my_timer_main/layout/basic.html" %}
 {% load bootstrap4 %}
+{% load dav_filter %}
 {% block title %}Рабочее место{% endblock %}
 {%block head %}
     {# Include FontAwesome; required for icon display #}
@@ -10,11 +11,13 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{ form_search.media }}
-    
+    <link href="/examples/vendors/fontawesome-5/css/fontawesome-all.min.css" rel="stylesheet">
 
 {% endblock %}
 {%block menu_block%}
 {% load static %}
+<link rel="stylesheet" type="text/css"
+href="{% static 'main/style.css' %}">
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
   {% comment %} <div class="container-fluid mb-2"> {% endcomment %}
     <div class="row">
@@ -35,8 +38,8 @@
   <table class="table table-hover table table-striped table-hover">
     <thead>
         <tr>
-          <th scope="col" style="width: 40%;">Задача</th>
-          <th scope="col" style="width: 30%;">Клиент</th>
+          <th scope="col" style="width: 50%;">Задача</th>
+          <th scope="col" style="width: 25%;">Клиент</th>
           <th scope="col" style="width: 10%;">Начало</th>
           <th scope="col" style="width: 10%;">Длительность</th>
           <th scope="col" style="width: 5%;"></th>
@@ -48,9 +51,9 @@
           <td><a href="#">{{ time_tracker.task.name }}</td>
             <td><a href="#">{{ time_tracker.task.client.name }}</td>
               <td>{{ time_tracker.date_start|date:'d-m  H:i' }}</td>
-                <td>{{ time_tracker.duration_sec }}</td>
-                  <td><a href="{% url 'my_timer:action_wich_tasks' action='stop' id=time_tracker.pk %}"><img src="{% static 'main/ico_stop.png' %}"
-                    width="18" height="18" alt="Остановить задачу"></a>
+                <td>{{ time_tracker.duration_sec|sec_to_hh_mm }}</td>
+                  <td><a href="{% url 'my_timer:action_wich_tasks' action='stop' id=time_tracker.pk %}" class="btn btn-outline-danger btn-circle" role="button"><img src="{% static 'main/ico_stop.png' %}"
+                    class="ico-button" alt="Остановить задачу"></a>
                     </td>
             </tr>
         {% endfor %}
@@ -74,10 +77,10 @@
     <table class="table table-hover table table-striped table-hover">
     <thead>
         <tr>
-          <th scope="col" style="width: 45%;">Задача</th>
-          <th scope="col" style="width: 30%;">Клиент</th>
+          <th scope="col" style="width: 50%;">Задача</th>
+          <th scope="col" style="width: 25%;">Клиент</th>
           <th scope="col" style="width: 5%;">Дней назад</th>
-          <th scope="col" style="width: 10%;">Текущее время</th>
+          <th scope="col" style="width: 10%;">Текущее время (HH:MM)</th>
           <th scope="col" style="width: 5%;"></th>
         </tr>
       </thead>
@@ -88,20 +91,34 @@
           <td><a href="#">{{ dic_of_data.task_name }}</td>
             <td><a href="#">{{ dic_of_data.client_name }}</td>
               <td>{{ dic_of_data.diff_day }}</td>
-                <td>{{ dic_of_data.task_duration }}</td>
+                <td>{{ dic_of_data.task_duration|sec_to_hh_mm}}</td>
                   <td>
-                    <a href="{% url 'my_timer:action_wich_tasks' action='start' id=dic_of_data.task_id %}"><img src="{% static 'main/ico_start.png' %}"
-                      width="18" height="18" alt="Запуск задачи"></a>
-                    <a href="#"><img src="{% static 'main/ico_list.png' %}"
-                      width="18" height="18" alt="Открыть в списке"></a>
-                      <a href="#"><img src="{% static 'main/ico_deactive.png' %}"
-                        width="18" height="18" alt="Деактивировать задачу"></a>
-            </tr>
+                    <div class="container text-center button_container">
+                      <a href="{% url 'my_timer:action_wich_tasks' action='start' id=dic_of_data.task_id %}" class="btn btn-outline-success btn-circle" role="button" ><img src="{% static 'main/ico_play.png' %}"
+                        class="ico-button" alt="Запуск задачи" ></a>
+                          <a href="#" class="btn btn-outline-warning btn-circle " role="button" ><img src="{% static 'main/ico_history.png' %}"
+                            class="ico-button" alt="История по задаче"></a>
+                          <a href="#" class="btn btn-outline-danger btn-circle " role="button" ><img src="{% static 'main/ico_checked.png' %}"
+                            class="ico-button" alt="Пометить выполненной"></a>
+                    </div>
+                    </tr>
         {% endfor %}
         {% endif %}
       </tbody>
 </table>
 </fieldset>
 </div>
+                    {% comment %} <div style="margin-right: 3px;">
+                    <a href="{% url 'my_timer:action_wich_tasks' action='start' id=dic_of_data.task_id %}"><img src="{% static 'main/ico_start.png' %}"
+                      width="18" height="18" alt="Запуск задачи"></a>
+                    </div>
+                    <div style="margin-right: 3px;">
+                      <a href="#"><img src="{% static 'main/ico_list.png' %}"
+                      width="18" height="18" alt="Открыть в списке"></a>
+                    </div>
+                    <div>
+                        <a href="#"><img src="{% static 'main/ico_deactive.png' %}"
+                        width="18" height="18" alt="Деактивировать задачу"></a>
+                      </div> {% endcomment %}
 
-{% endblock %}
+                      {% endblock %}
