@@ -11,8 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{ form_search.media }}
-    <link href="/examples/vendors/fontawesome-5/css/fontawesome-all.min.css" rel="stylesheet">
-
+    {% comment %} <link href="/examples/vendors/fontawesome-5/css/fontawesome-all.min.css" rel="stylesheet"> {% endcomment %}
 {% endblock %}
 {%block menu_block%}
 {% load static %}
@@ -65,7 +64,6 @@ href="{% static 'main/style.css' %}">
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
   <div class="row">
   <form class="col-md-auto form-inline">
-  {% csrf_token %}
   {% bootstrap_form form_search %}
   {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
   {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
@@ -88,17 +86,17 @@ href="{% static 'main/style.css' %}">
         {% if array_dic_of_data_last_tasks %}
         {% for dic_of_data in array_dic_of_data_last_tasks %}
         <tr>
-          <td><a href="#">{{ dic_of_data.task_name }}</td>
-            <td><a href="#">{{ dic_of_data.client_name }}</td>
+          <td><a href="{% url 'my_timer:task_edit' task_id=dic_of_data.task_id %}">{{ dic_of_data.task_name }}</td>
+            <td><a href="{% url 'my_timer:client_edit' client_id=dic_of_data.client_id %}">{{ dic_of_data.client_name }}</td>
               <td>{{ dic_of_data.diff_day }}</td>
                 <td>{{ dic_of_data.task_duration|sec_to_hh_mm}}</td>
                   <td>
                     <div class="container text-center button_container">
                       <a href="{% url 'my_timer:action_wich_tasks' action='start' id=dic_of_data.task_id %}" class="btn btn-outline-success btn-circle" role="button" ><img src="{% static 'main/ico_play.png' %}"
                         class="ico-button" alt="Запуск задачи" ></a>
-                          <a href="#" class="btn btn-outline-warning btn-circle " role="button" ><img src="{% static 'main/ico_history.png' %}"
+                          <a href="{% url 'my_timer:time_track_list_filter' %}?task_name={{dic_of_data.task_name}}&client={{dic_of_data.client_id}}&search_button='search' " class="btn btn-outline-warning btn-circle " role="button" ><img src="{% static 'main/ico_history.png' %}"
                             class="ico-button" alt="История по задаче"></a>
-                          <a href="#" class="btn btn-outline-danger btn-circle " role="button" ><img src="{% static 'main/ico_checked.png' %}"
+                          <a href="{% url 'my_timer:action_wich_tasks' action='task_done' id=dic_of_data.task_id %}" class="btn btn-outline-danger btn-circle " role="button" ><img src="{% static 'main/ico_checked.png' %}"
                             class="ico-button" alt="Пометить выполненной"></a>
                     </div>
                     </tr>

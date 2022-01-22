@@ -277,6 +277,10 @@ def action_wich_tasks(request, action, id):
         time_track = get_object_or_404(TimeTrack, pk=id)
         time_track.date_stop = tz.now()
         time_track.save()
+    elif action == "task_done":
+        task = get_object_or_404(Tasks, pk=id)
+        task.is_active = False
+        task.save()
     else:
         return HttpResponse(f'action "{action}" not possible')
 
@@ -304,6 +308,7 @@ def time_track_list(request):
         if dic_of_filter is None:
             dic_of_filter = dict.fromkeys(filter_list)
             caches['mem_cache'].set(cache_key_filter, dic_of_filter, timeout=timeout_cache)
+
 
     array_list_of_q = []
     for key, value in dic_of_filter.items():
