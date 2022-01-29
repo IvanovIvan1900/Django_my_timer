@@ -2,6 +2,7 @@
 {% load bootstrap4 %}
 {% load dav_filter %}
 {% block title %}Рабочее место{% endblock %}
+{% load static %}
 {%block head %}
     {# Include FontAwesome; required for icon display #}
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
@@ -11,10 +12,9 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{ form_search.media }}
-    {% comment %} <link href="/examples/vendors/fontawesome-5/css/fontawesome-all.min.css" rel="stylesheet"> {% endcomment %}
-{% endblock %}
+    <script src="{% static 'main/work_place.js' %}"></script>
+    {% endblock %}
 {%block menu_block%}
-{% load static %}
 <link rel="stylesheet" type="text/css"
 href="{% static 'main/style.css' %}">
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
@@ -34,7 +34,7 @@ href="{% static 'main/style.css' %}">
 {% if active_time_treket %}
   <fieldset>
   <legend >Активные задачи</legend>
-  <table class="table table-hover table table-striped table-hover">
+  <table class="table table-hover table table-striped table-hover" id="table_active_task">
     <thead>
         <tr>
           <th scope="col" style="width: 50%;">Задача</th>
@@ -50,7 +50,7 @@ href="{% static 'main/style.css' %}">
           <td><a href="#">{{ time_tracker.task.name }}</td>
             <td><a href="#">{{ time_tracker.task.client.name }}</td>
               <td>{{ time_tracker.date_start|date:'d-m  H:i' }}</td>
-                <td>{{ time_tracker.duration_sec|sec_to_hh_mm }}</td>
+                <td id='date_start_id_{{time_tracker.id}}'><input type="hidden" value='{{time_tracker.date_start|date:"Y-m-d_H:i:s"}}'>{{ time_tracker.duration_sec|sec_to_hh_mm }}</td>
                   <td><a href="{% url 'my_timer:action_wich_tasks' action='stop' id=time_tracker.pk %}" class="btn btn-outline-danger btn-circle" role="button"><img src="{% static 'main/ico_stop.png' %}"
                     class="ico-button" alt="Остановить задачу"></a>
                     </td>
@@ -106,17 +106,4 @@ href="{% static 'main/style.css' %}">
 </table>
 </fieldset>
 </div>
-                    {% comment %} <div style="margin-right: 3px;">
-                    <a href="{% url 'my_timer:action_wich_tasks' action='start' id=dic_of_data.task_id %}"><img src="{% static 'main/ico_start.png' %}"
-                      width="18" height="18" alt="Запуск задачи"></a>
-                    </div>
-                    <div style="margin-right: 3px;">
-                      <a href="#"><img src="{% static 'main/ico_list.png' %}"
-                      width="18" height="18" alt="Открыть в списке"></a>
-                    </div>
-                    <div>
-                        <a href="#"><img src="{% static 'main/ico_deactive.png' %}"
-                        width="18" height="18" alt="Деактивировать задачу"></a>
-                      </div> {% endcomment %}
-
-                      {% endblock %}
+{% endblock %}

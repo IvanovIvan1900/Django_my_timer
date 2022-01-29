@@ -9,3 +9,4 @@ bboard.data
 **migrations**
 .env
 **.sqlite3
+**.log*
