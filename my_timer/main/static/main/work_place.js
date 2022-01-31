@@ -27,23 +27,23 @@ function update_duration() {
             let date_start = elem.get('date_start');
             let date_now = new Date();
             let time_delta_in_sec = (date_now - date_start) / 1000;
-            td.innerText = get_present_time_delta(time_delta_in_sec);
+            td.innerText = seconds_to_hh_mm(time_delta_in_sec);
         }
     }
 }
 
-function get_present_time_delta(time_delta_in_sec) {
-    let hour_del = 3600;
-    let min_del = 60;
-    let sec = time_delta_in_sec;
-    let hours = Math.floor(sec / hour_del);
-    sec = sec % hour_del;
-    let min = Math.floor(sec / min_del);
-    let hours_str = ("0" + hours).slice(-2);
-    let min_str = ("0" + min).slice(-2);
-    let str_repr = `${hours_str}:${min_str}`;
-    return str_repr;
-}
+// function get_present_time_delta(time_delta_in_sec) {
+//     let hour_del = 3600;
+//     let min_del = 60;
+//     let sec = time_delta_in_sec;
+//     let hours = Math.floor(sec / hour_del);
+//     sec = sec % hour_del;
+//     let min = Math.floor(sec / min_del);
+//     let hours_str = ("0" + hours).slice(-2);
+//     let min_str = ("0" + min).slice(-2);
+//     let str_repr = `${hours_str}:${min_str}`;
+//     return str_repr;
+// }
 
 if (updatable_list == undefined) {
     document.addEventListener("DOMContentLoaded", get_info_form_page);

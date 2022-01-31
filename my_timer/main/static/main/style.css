@@ -21,3 +21,15 @@
     width: 20px;
     height: 20px;
 }
+
+
+/* div {
+    list-style: none;
+    border: 1px solid red;
+} */
+
+.my_inline {
+    display: flex;
+    /* Lay out each item using flex layout */
+    flex-flow: row;
+}
