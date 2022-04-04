@@ -35,6 +35,7 @@ class Tasks(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True,
                 verbose_name='Создана')
     user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.PROTECT)
+    date_start_plan = models.DateField(verbose_name="Дата старта (план)", null=True)
     class Meta:
         verbose_name_plural = 'Задачи'
         verbose_name = 'Задача'

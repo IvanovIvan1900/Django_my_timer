@@ -18,6 +18,10 @@ psycopg2-binary = "^2.9.3"
 
 [tool.poetry.dev-dependencies]
 commitizen = "^2.20.3"
+pytest = "^7.1.1"
+pytest-django = "^4.5.2"
+pytest-xdist = "^2.5.0"
+pytest-lazy-fixture = "^0.6.3"
 
 
 [tool.commitizen]
