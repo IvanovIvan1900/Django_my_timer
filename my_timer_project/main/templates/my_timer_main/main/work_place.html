@@ -78,6 +78,7 @@
           <th scope="col" style="width: 50%;">Задача</th>
           <th scope="col" style="width: 25%;">Клиент</th>
           <th scope="col" style="width: 5%;">Дней назад</th>
+          <th scope="col" style="width: 5%;">Дата план</th>
           <th scope="col" style="width: 10%;">Текущее время (HH:MM)</th>
           <th scope="col" style="width: 5%;"></th>
         </tr>
@@ -85,10 +86,20 @@
       <tbody>
         {% if array_dic_of_data_last_tasks %}
         {% for dic_of_data in array_dic_of_data_last_tasks %}
+        {% if dic_of_data.is_plan %}
+          {% if dic_of_data.is_outdate %}
+              <tr class="table-danger">
+            {% else %}
+              <tr class="table-warning">
+            {% endif %}
+    
+        {% else %}
         <tr>
+          {% endif %}
           <td><a href="{% url 'my_timer:task_edit' task_id=dic_of_data.task_id %}">{{ dic_of_data.task_name }}</td>
             <td><a href="{% url 'my_timer:client_edit' client_id=dic_of_data.client_id %}">{{ dic_of_data.client_name }}</td>
               <td>{{ dic_of_data.diff_day }}</td>
+              <td>{{ dic_of_data.date_start_plan|date:"d.m.Y" }}</td>
                 <td>{{ dic_of_data.task_duration|sec_to_hh_mm}}</td>
                   <td>
                     <div class="container text-center button_container">

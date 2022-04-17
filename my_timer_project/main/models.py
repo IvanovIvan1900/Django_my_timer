@@ -67,7 +67,8 @@ class TimeTrack(models.Model):
     duration_sec = models.IntegerField(verbose_name="Продолжительность (сек.)")
     user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.PROTECT, db_index = True)
     is_active = models.BooleanField(verbose_name="Задача в работе", default = False, db_index= True)
-
+    date_account = models.DateField(verbose_name="Дата счета", null=True)
+    
     class Meta:
         verbose_name_plural = 'Трек по задачам'
         verbose_name = 'Трек по задаче'

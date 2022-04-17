@@ -2,89 +2,131 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{% block title %}Главная{% endblock %} -Тайм трекер</title>
-    {% bootstrap_css %}
-    <!-- <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}"> -->
-    {% bootstrap_javascript jquery='slim' %}
-    {% block head %}
-    {% endblock %}
-</head>
-
-<body class="container-fluid">
-    <header class="mb-4">
-        <h1 class="display-1 text-center">Тайм трекер</h1>
-    </header>
-    <div class="row">
-        <div class="col">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'my_timer:work_place' %}">Рабочее место</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'my_timer:client_list' %}">Клиенты</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'my_timer:task_list' %}">Задачи</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="navbar-brand" href="{% url 'my_timer:time_track_list' %}">Тайм треки</a>
-                    </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Отчет
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Отчет 1</a>
-                    <a class="dropdown-item" href="#">Отчет 2</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Отчет 3</a>
-                    </div>
-                </li>
-                </ul>
-                {% if user.is_authenticated%}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ user.username}}
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Профиль</a>
-                    <a class="dropdown-item" href="#">Изменить пароль</a>
-                    <a class="dropdown-item" href="{% url 'my_timer:logout' %}">Выход</a>
-                    </div>
-                </li>
-                {% endif%}
-    
-            </nav>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>
+            {% block title %}Главная{% endblock %}
+        -Тайм трекер</title>
+        {% bootstrap_css %}
+        <!-- <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}"> -->
+        {% bootstrap_javascript jquery='slim' %}
+        {% block head %}{% endblock %}
+    </head>
+    <body class="container-fluid">
+        <header class="mb-4">
+            <h5 class="text-center">Тайм трекер</h5>
+        </header>
+        <div class="row">
+            <div class="col">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="navbar-brand" href="{% url 'my_timer:work_place' %}">Рабочее место</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="navbar-brand" href="{% url 'my_timer:client_list' %}">Клиенты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="navbar-brand" href="{% url 'my_timer:task_list' %}">Задачи</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="navbar-brand" href="{% url 'my_timer:time_track_list' %}">Тайм треки</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="navbarDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                Отчет
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{% url 'my_timer:report_task_list' %}">Отчет по задачам</a>
+                                {% comment %} <a class="dropdown-item" href="#">Отчет 2</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Отчет 3</a> {% endcomment %}
+                            </div>
+                        </li>
+                    </ul>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="navbarDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+                                {{ user.username }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Профиль</a>
+                                <a class="dropdown-item" href="#">Изменить пароль</a>
+                                <a class="dropdown-item" href="{% url 'my_timer:logout' %}">Выход</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                </nav>
+            </div>
+            <div class="col">
+                {% block menu_block %}{% endblock %}
+            </div>
         </div>
-        <div class="col">
-            {% block menu_block %}
-            {% endblock %}
+        <div class="row">
+            <section class="col border py-2">
+                {% bootstrap_messages %}
+                {% block content %}{% endblock %}
+            </section>
         </div>
-    </div>
-    <div class="row">
-        <section class="col border py-2">
-            {% bootstrap_messages %}
-            {% block content %}
-            {% endblock %}
-        </section>
-    </div>
-    <footer class="mt-3">
-        <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
-        <div>Icons made by <a href="" title="itim2101">itim2101</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
-        <div>Автор иконок: <a href="https://www.flaticon.com/ru/authors/pixel-perfect" title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/ru/" title="Flaticon">www.flaticon.com</a></div>
-        <div>Автор иконок: <a href="https://www.flaticon.com/ru/authors/kiranshastry" title="Kiranshastry">Kiranshastry</a> from <a href="https://www.flaticon.com/ru/" title="Flaticon">www.flaticon.com</a></div>    
-        <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">Play button icons created by Good Ware - Flaticon</a>
-        <a href="https://www.flaticon.com/free-icons/tick" title="tick icons">Tick icons created by Webalys - Flaticon</a>
-        <a href="https://www.flaticon.com/free-icons/history" title="history icons">History icons created by Google - Flaticon</a>
-        <a href="https://www.flaticon.com/free-icons/stop-button" title="stop button icons">Stop button icons created by Pixel perfect - Flaticon</a>
-        <a href="https://www.flaticon.com/free-icons/play-button" title="play button icons">Play button icons created by abdul allib - Flaticon</a>
-            {% comment %} <p class="text-right font-italic">&copy; читатели.</p> {% endcomment %}
-    </footer> 
-</body>
-
+        <footer class="mt-3">
+            <div id="accordion">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <button class="btn btn-link"
+                                data-toggle="collapse"
+                                data-target="#collapseOne"
+                                aria-expanded="true"
+                                aria-controls="collapseOne">
+                            Используемые иконки
+                        </button>
+                    </div>
+                    <div id="collapseOne"
+                         class="collapse"
+                         aria-labelledby="headingOne"
+                         data-parent="#accordion">
+                        <div class="card-body">
+                            <div>
+                                Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+                            </div>
+                            <div>
+                                Icons made by <a href="" title="itim2101">itim2101</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+                            </div>
+                            <div>
+                                Автор иконок: <a href="https://www.flaticon.com/ru/authors/pixel-perfect"
+    title="Pixel perfect">Pixel perfect</a> from <a href="https://www.flaticon.com/ru/" title="Flaticon">www.flaticon.com</a>
+                            </div>
+                            <div>
+                                Автор иконок: <a href="https://www.flaticon.com/ru/authors/kiranshastry"
+    title="Kiranshastry">Kiranshastry</a> from <a href="https://www.flaticon.com/ru/" title="Flaticon">www.flaticon.com</a>
+                            </div>
+                            <a href="https://www.flaticon.com/free-icons/play-button"
+                               title="play button icons">Play button icons created by Good Ware - Flaticon</a>
+                            <a href="https://www.flaticon.com/free-icons/tick" title="tick icons">Tick icons created by Webalys - Flaticon</a>
+                            <a href="https://www.flaticon.com/free-icons/history"
+                               title="history icons">History icons created by Google - Flaticon</a>
+                            <a href="https://www.flaticon.com/free-icons/stop-button"
+                               title="stop button icons">Stop button icons created by Pixel perfect - Flaticon</a>
+                            <a href="https://www.flaticon.com/free-icons/play-button"
+                               title="play button icons">Play button icons created by abdul allib - Flaticon</a>
+                            <a target="_blank" href="https://icons8.com/icon/35041/снять-все">Снять все</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </body>
 </html>

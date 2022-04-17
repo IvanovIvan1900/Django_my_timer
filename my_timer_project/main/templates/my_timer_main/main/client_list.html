@@ -1,6 +1,7 @@
 {% extends "my_timer_main/layout/basic.html" %}
 {% load bootstrap4 %}
 {% block title %}Клиенты{% endblock %}
+{% load static %}
 {%block menu_block%}
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
   <a class="navbar-brand" href="{% url 'my_timer:client_add' %}">Добавить клиента</a>
@@ -26,7 +27,7 @@
               <th scope="col" style="width: 5%;">Активный</th>
               <th scope="col" style="width: 35%;">Имя</th>
               <th scope="col" style="width: 50%;">Полное имя</th>
-              <th scope="col" style="width: 10%;">Удалить</th>
+              <th scope="col" style="width: 5%;">Удалить</th>
             </tr>
           </thead>
           <tbody>
@@ -40,7 +41,8 @@
             {% endif%}
               <td><a href="{% url 'my_timer:client_edit' client_id=client.pk %}">{{ client.name }}</td>
               <td>{{ client.full_name}}</td>
-              <td><a href="{% url 'my_timer:client_delete' client_id=client.pk %}">"Удалить"</td>
+              <td><a href="{% url 'my_timer:client_delete' client_id=client.pk %}"><img src="{% static 'main/ico_deactive.png' %}"
+                width="18" height="18" alt="Удалить"></td>
               </tr>
             {% endfor %}
             {% endif %}

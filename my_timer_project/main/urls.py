@@ -1,5 +1,5 @@
 from django.urls import path, re_path, include
-from .views import client_list
+from .views import client_list, report_task_list
 from django.conf import settings 
 from django.views.decorators.cache import never_cache
 from django.conf.urls.static import static
@@ -28,6 +28,7 @@ urlpatterns = [
     path('task_add/', task_edit_or_add, name = 'task_add'),
     path('task_list/', task_list, name = 'task_list'),
     path('work_place/', work_place, name = 'work_place'),
+    path('report_task_list/', report_task_list, name = 'report_task_list'),
     # re_path(r'^time_track_list_filter(?:/(<task_name>\w*))?(?:/(<client>\w*))?(?:/(<search_button>\w*))?/$', time_track_list, name = 'time_track_list_filter'),
     re_path(r'^time_track_list_filter/$', time_track_list, name = 'time_track_list_filter'),
     path('time_track_list/', time_track_list, name = 'time_track_list'),

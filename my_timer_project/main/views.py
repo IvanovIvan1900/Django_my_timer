@@ -1,3 +1,4 @@
+import datetime
 import pytz
 # from .forms import FormTestWidget
 from django.contrib.auth.decorators import login_required
@@ -52,7 +53,7 @@ def client_list(request):
 @login_required
 def client_edit_or_add(request, client_id = ""):
     client = None
-    iclient = get_object_or_404(Clients, pk=client_id) if client_id else None
+    client = get_object_or_404(Clients, pk=client_id) if client_id else None
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         if client:
@@ -172,6 +173,8 @@ def work_place(request):
             task_duration
             diff_day - сколько дней назад последний раз работали с задачей
             date_start_plan
+            is_plan - это задача с датой начала
+            is_outdate - это задача уже просрочена
         """
         # task_name = "test"
         # clien_filter_id = 1
@@ -211,6 +214,13 @@ def work_place(request):
             dic_of_data["task_duration"] = elem.get("duration")
             dic_of_data["date_start_plan"] = temp_task.date_start_plan
             dic_of_data['diff_day'] = ''
+            dic_of_data['is_plan'] = False
+            dic_of_data['is_outdate'] = False
+            if temp_task.date_start_plan is not None and dic_of_data["task_duration"] < 100:
+                dic_of_data['is_plan'] = True
+                if dic_of_data["date_start_plan"] < datetime.date.today() and dic_of_data["task_duration"] < 100:
+                    dic_of_data['is_outdate'] = True
+
             if elem['date_max'] is not None:
                 max_date = elem['date_max']
                 max_date = max_date.replace(tzinfo=tz_curr)
@@ -329,7 +339,13 @@ def action_wich_tasks(request, action, id):
 
     
     return HttpResponseRedirect(reverse('my_timer:work_place'))
+
+@login_required
+def report_task_list(request):
+    return render(request, 'my_timer_main/main/report_tasks_clients.html')
+
 # def cleint_filter(request, filter_text):
+
 #     # request.session.
 #     request.session['client_filter'] = filter_text
 #     return HttpResponseRedirect(reverse('my_timer:client_list'))

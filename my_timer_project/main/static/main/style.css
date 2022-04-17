@@ -33,3 +33,9 @@
     /* Lay out each item using flex layout */
     flex-flow: row;
 }
+
+
+/* .inner-div {
+    display: table-cell;
+    vertical-align: bottom;
+} */

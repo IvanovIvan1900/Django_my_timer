@@ -1,6 +1,7 @@
 {% extends "my_timer_main/layout/basic.html" %}
 {% load bootstrap4 %}
-{% block title %}Клиенты{% endblock %}
+{% block title %}Задачи{% endblock %}
+{% load static %}
 {%block menu_block%}
 <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
   <a class="navbar-brand" href="{% url 'my_timer:task_add' %}">Добавить задачу</a>
@@ -23,7 +24,8 @@
               <th scope="col" style="width: 5%;">Активная</th>
               <th scope="col" style="width: 35%;">Имя задачи</th>
               <th scope="col" style="width: 50%;">Имя клиента</th>
-              <th scope="col" style="width: 10%;">Удалить</th>
+              <th scope="col" style="width: 50%;">Дата начала (план)</th>
+              <th scope="col" style="width: 5%;">Удалить</th>
             </tr>
           </thead>
           <tbody>
@@ -37,7 +39,9 @@
             {% endif%}
               <td><a href="{% url 'my_timer:task_edit' task_id=task.pk %}">{{ task.name }}</td>
               <td><a href="{% url 'my_timer:client_edit' client_id=task.client.pk %}">{{ task.client.name}}</td>
-              <td><a href="{% url 'my_timer:task_delete' task_id=task.pk %}">"Удалить"</td>
+                <td>{{ task.date_start_plan|date:"d.m.Y" }}</td>
+                  <td><a href="{% url 'my_timer:task_delete' task_id=task.pk %}"><img src="{% static 'main/ico_deactive.png' %}"
+                    width="18" height="18" alt="Удалить"></td>
               </tr>
             {% endfor %}
             {% endif %}

@@ -1,3 +1,5 @@
+import datetime
+from django.conf import settings
 from django.db import models
 from django.db.models import fields
 from .models import Clients
@@ -7,6 +9,7 @@ from .models import TimeTrack
 from django_select2 import forms as s2forms
 from .utility import get_qery_client_wich_cahce, get_qery_active_task_wich_cahce
 from tempus_dominus.widgets import DatePicker
+from django.core.exceptions import ValidationError
 
 #=================================================
 #+++++++++++++MY WIDHET++++++++++++++++++++++++++
@@ -59,11 +62,40 @@ class SearchForm(forms.Form):
     keyword = forms.CharField(required=False, max_length=30, label='')
 
 class FormChangeTask(forms.ModelForm):
+    date_start_plan = forms.DateField(required=False,
+         label='Дата начала (План)', widget=DAV_DataFieldWidget(), input_formats=("%d.%m.%Y",))
     class Meta:
         model = Tasks
-        fields = ['name', 'client', 'is_active', 'user', 'description']
+        fields = ['name', 'client', 'is_active', 'user', 'description', 'date_start_plan']
         # exclude = ['user']
+        # widgets = {'user': forms.HiddenInput, 'date_start_plan':forms.DateInput(format=('%Y-%m-%d'),
+        #         attrs={ 
+        #        'placeholder': 'Select a date',
+        #        'type': 'date'
+        #       })}
+        # widgets = {'user': forms.HiddenInput, 'date_start_plan':DAV_DataFieldWidget(options={"format":"DD.MM.YYYY"})}
         widgets = {'user': forms.HiddenInput}
+    def __init__(self, *args, **kwargs):
+        super(FormChangeTask, self).__init__(*args, **kwargs)
+        # self.fields['date_start_plan'].required = False
+        self.fields['description'].required = False
+
+    # def clean_date_start_plan(self):
+    #     a =4 
+    #     return datetime.date.today()
+
+    def clean(self):
+        super().clean()
+        errors = {}
+        if self.data["date_start_plan"]:
+            try:
+                date_start_plan = datetime.datetime.strptime(self.data["date_start_plan"], "%d.%m.%Y").date()
+                self.cleaned_data["date_start_plan"] = date_start_plan
+            except ValueError as e:
+                errors["date_start_plan"] = ValidationError(
+                            'Укажите дату в корректном формате. Ожидается ДД.ММ.ГГГГ')
+        if errors:
+            raise ValidationError(errors)
 
 class FormNewTask(forms.Form):
     task = forms.CharField(required=True, max_length=100, label='Задача')

@@ -1,12 +1,13 @@
 let info_from_page = new Map();
 let has_a_table = false;
 let table_time_tracker = undefined;
-
+let crf_token = undefined
 document.addEventListener("DOMContentLoaded", action_after_load_page);
 
 function action_after_load_page() {
     table_time_tracker = document.getElementById('time_track_list');
     info_from_page.set('curr_string_info', undefined)
+    crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
     if (table_time_tracker != undefined) {
         has_a_table = true;
         table_time_tracker.addEventListener('click', click_to_table);
@@ -26,6 +27,7 @@ function add_element_to_edit(td) {
     let new_info_map = new Map();
 
     new_info_map.set('root_td', td);
+    new_info_map.set('time_track_id', td.dataset.tt_id);
     new_info_map.set('date_start', new Date(td.dataset.date_start.replace('_', 'T')));
     new_info_map.set('date_stop', new Date(td.dataset.date_stop.replace('_', 'T')));
     new_info_map.set('duration', Number(td.dataset.duration));
@@ -120,6 +122,61 @@ function click_to_button(event) {
     close_element_to_edit();
 }
 
-function update_info_in_bd() {
+function toIsoString(date) {
+    var tzo = -date.getTimezoneOffset(),
+        dif = tzo >= 0 ? '+' : '-',
+        pad = function(num) {
+            return (num < 10 ? '0' : '') + num;
+        };
 
+    return date.getFullYear() +
+        '-' + pad(date.getMonth() + 1) +
+        '-' + pad(date.getDate()) +
+        'T' + pad(date.getHours()) +
+        ':' + pad(date.getMinutes()) +
+        ':' + pad(date.getSeconds()) +
+        dif + pad(Math.floor(Math.abs(tzo) / 60)) +
+        ':' + pad(Math.abs(tzo) % 60);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function update_info_in_bd() {
+    curr_string_info = info_from_page.get('curr_string_info')
+    if ((crf_token != undefined) && (curr_string_info != undefined)) {
+        let update_info = {
+            "date_start": toIsoString(curr_string_info.get('date_start')),
+            "date_stop": toIsoString(curr_string_info.get('date_stop'))
+        };
+        $.ajax({
+            type: "PUT",
+            url: "/api/tt/".concat(curr_string_info.get('time_track_id')).concat("/"),
+            data: JSON.stringify(update_info),
+            headers: {
+                "Content-Type": "application/json",
+                // "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": getCookie("csrftoken"), // don't forget to include the 'getCookie' function
+            }
+            // success: (data) => {
+            //     console.log(data);
+            // },
+            // error: (error) => {
+            //     console.log(error);
+            // }
+        });
+    }
 }

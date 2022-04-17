@@ -1,0 +1,129 @@
+{% extends "my_timer_main/layout/basic.html" %}
+{% load bootstrap4 %}
+{% load static %}
+{% block head %}
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css"
+          rel="stylesheet"
+          type="text/css"/>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <script src="{% static 'main/report.js' %}"></script>
+    <script src="{% static 'main/main.js' %}"></script>
+    <!- data pecker->
+    {% comment %} <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script> {% endcomment %}
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css"/>
+    <!- select ->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+          rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="{% static 'main/style.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+{% block title %}Отчет по задачам{% endblock %}
+{% block menu_block %}{% endblock %}
+{% block content %}
+    {% comment %} <div id="filters" class="container-fluid"> {% endcomment %}
+    <div class="container-fluid border">
+        <div class="row">
+            <div class="col-sm">
+                <label>Период:</label>
+                <input type="text"
+                       class="form-control"
+                       id="period"
+                       name="period"
+                       placeholder="Период"
+                       required>
+            </div>
+            <div class="col-sm">
+                <div>
+                    <label >Клиент:</label>
+                </div>
+                <div class="container-fluid">
+                    <select name="client"
+                            lang="None"
+                            class="js-data-client-ajax"
+                            style="width:90%;"
+                            title=""
+                            id="id_client">
+                        <option value="">
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm">
+                <label for="task_name">Задача(Часть имени):</label>
+                <input type="text"
+                       class="form-control"
+                       id="task_name"
+                       name="task_name"
+                       placeholder="Задача"
+                       required>
+            </div>
+            <div class="col align-self-end">
+                <div >
+                    <input type="checkbox"
+                           id="only_wichout_account"
+                           name="only_wichout_account"
+                           checked>
+                    <label for="only_wichout_account">Только не выставленные</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <button id="btnFilter" class="btn btn-light">Отфильтровать</button>
+            <button id="btnCancelFilter" class="btn btn-light">Сбросить фильтр</button>
+        </div>
+    </div>
+    {% comment %} </div> {% endcomment %}
+    <div id="data_report">
+        <div class="container-fluid border">
+            <div class="container-fluid border">
+                <button id="btnExpandAll" class="btn btn-light">
+                    <img src="{% static 'main/ico_expandAll.png' %}"
+                         class="ico-button"
+                         alt="Развернуть все">
+                </button>
+                <button id="btnCollapsAll" class="btn btn-light">
+                    <img src="{% static 'main/ico_collapsAll.png' %}"
+                         class="ico-button"
+                         alt="Свернуть все">
+                </button>
+                <button id="btnCheckAll" class="btn btn-light">
+                    <img src="{% static 'main/ico_checkAll.png' %}"
+                         class="ico-button"
+                         alt="Развернуть все">
+                </button>
+                <button id="btnUncheckAll" class="btn btn-light">
+                    <img src="{% static 'main/ico_checkAll.png' %}"
+                         class="ico-button"
+                         alt="Свернуть все">
+                </button>
+            </div>
+            {% comment %} <div class="row">
+            <button id="btnSave" class="btn btn-default">Save Checked Nodes</button>
+            <button id="btnSave" class="btn btn-default">Save Checked 2</button>
+            </div> {% endcomment %}
+            <div class="row">
+                <div id="tree"></div>
+            </div>
+        </div>
+    </div>
+    {% comment %} <div class="row d-flex justify-content-center">
+  {% if page.has_previous %}
+  <a href="?page={{ page.previous_page_number }}">&lt;</a>
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  {% endif %}
+  Часть No{{ page.number }} из {{ page.paginator.num_pages }}
+  {% if page.has_next %}
+  &nbsp;&nbsp;|&nbsp;&nbsp;
+  <a href="?page={{ page.next_page_number }}">&gt;</a>
+  {% endif %}
+    </div> {% endcomment %}
+{% endblock %}

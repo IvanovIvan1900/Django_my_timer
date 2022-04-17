@@ -56,6 +56,7 @@ INTERNAL_IPS = [
 INSTALLED_APPS = [
     'bootstrap4',
     'jazzmin',
+    'api.apps.ApiConfig',
     'main.apps.MainConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -67,6 +68,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "django_select2",
     'tempus_dominus',
+    'rest_framework',
+    'corsheaders',    
 ]
 
 MIDDLEWARE = [
@@ -78,6 +81,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'my_timer.urls'

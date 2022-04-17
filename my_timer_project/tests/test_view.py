@@ -34,6 +34,8 @@ class TestWorkPlaceView:
             # task_duration
             # diff_day - сколько дней назад последний раз работали с задачей
             # date_start_plan
+            # is_plan - это задача с датой начала
+            # is_outdate - это задача уже просрочена
 
       array_track = [elem for elem in list_of_time_tracker if elem.user == curr_user and 
                      elem.task.is_active and 
@@ -70,7 +72,14 @@ class TestWorkPlaceView:
 
 
       list_of_result.extend(temp_list_track)
-      
+      for elem in list_of_result:
+         elem['is_plan'] = False
+         elem['is_outdate'] = False
+         if elem['date_start_plan'] is not None and elem["task_duration"] < 100:
+            elem['is_plan'] = True
+            if elem["date_start_plan"] < datetime.today().date() and elem["task_duration"] < 100:
+               elem['is_outdate'] = True
+             
       return list_of_result[:count_last_tasks]
 
    @pytest.mark.django_db

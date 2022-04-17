@@ -1,7 +1,7 @@
 {% extends "my_timer_main/layout/basic.html" %}
 {% load bootstrap4 %}
 {% load dav_filter %}
-{% block title %}Клиенты{% endblock %}
+{% block title %}Отрезки времени{% endblock %}
 {% load static %}
 {%block head %}
     {# Include FontAwesome; required for icon display #}
@@ -48,6 +48,7 @@
 <div class="row">
 </div>
 <div class="row">
+  {% csrf_token %}
     <table class="table table-hover table table-striped table-hover" id="time_track_list" >
         <thead>
             <tr>
@@ -73,7 +74,7 @@
               <td><a href="{% url 'my_timer:client_edit' client_id=time_track.task.client.pk %}">{{ time_track.task.client.name}}</td>
               <td>{{time_track.date_start|date:'d-m  H:i'}} </td>
               <td>{{time_track.date_stop|date:'d-m  H:i'}} </td>
-              <td id='duration_id_{{time_track.task.pk}}' data-date_start='{{time_track.date_start|date:"Y-m-d_H:i:s"}}' 
+              <td id='duration_id_{{time_track.task.pk}}' data-tt_id='{{time_track.pk}}' data-date_start='{{time_track.date_start|date:"Y-m-d_H:i:s"}}' 
                   data-date_stop='{{time_track.date_stop|date:"Y-m-d_H:i:s"}}' data-duration='{{time_track.duration_sec}}'><div id="duration_edit" class="my_inline">
                       </div> 
                   <a id="a_time_duration" href="#" >{{time_track.duration_sec|sec_to_hh_mm}} </td>
