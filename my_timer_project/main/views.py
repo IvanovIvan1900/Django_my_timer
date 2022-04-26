@@ -433,3 +433,11 @@ def time_track_edit_or_add(request, time_track_id = ""):
 
     return render(request, 'my_timer_main/main/time_track_edit.html', {'form': form})
 
+# @login_required
+# def test_report(request):
+#     context= {"total_spend":100, "client_full_name":"Test", "date_start":datetime.datetime.now(),
+#         "date_stop":datetime.datetime.now()}
+#     array_of_task = [{"task_name": "Test 1", "spend_time": 15, "index": 1}, {"task_name": "Test 2", "spend_time": 250, "index": 2}]
+
+#     context["array_time_spend"] = array_of_task
+#     return render(request, 'my_timer_main/main/report.html', context)

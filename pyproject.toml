@@ -17,6 +17,7 @@ django-tempus-dominus = "^5.1.2"
 psycopg2-binary = "^2.9.3"
 django-cors-headers = "^3.11.0"
 djangorestframework = "^3.13.1"
+pdfkit = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 commitizen = "^2.20.3"

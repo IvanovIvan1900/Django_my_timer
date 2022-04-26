@@ -5,6 +5,8 @@
 // document.addEventListener("DOMContentLoaded", action_after_load_page);
 let tree_object;
 let select2_clietn;
+let dcit_convert_id_to_parent;
+let dict_convert_client_id_to_name;
 
 function settings_collect() {
     map_settings = {};
@@ -35,6 +37,8 @@ function settings_collect() {
 function tree_load_data_to_tree(data) {
     // [{ text: 'foo', id: "root", checked: true, children: [{ text: 'bar', id: "child" }] }]
     data_source = []
+    dcit_convert_id_to_parent = {}
+    dict_convert_client_id_to_name = {}
     for (client of data.array_of_client) {
         children = []
         client_id = ""
@@ -45,7 +49,9 @@ function tree_load_data_to_tree(data) {
                 id: "t_" + task["task_id"]
             });
             client_id = task["client_id"];
+            dcit_convert_id_to_parent["t_" + task["task_id"]] = "c_" + client_id;
         }
+        dict_convert_client_id_to_name["c_" + client_id] = client;
         dic_data_of_client = { text: client, checked: true, id: "c_" + client_id, children: children }
         data_source.push(dic_data_of_client)
     }
@@ -96,6 +102,75 @@ function settings_clearAll() {
 
 }
 
+// WORK WICH REPORT SAVE PDF
+function report_service_get_check_tasks() {
+    let dic_client_tasks = {};
+    let array_check_node = tree_object.getCheckedNodes();
+    for (let node of array_check_node) {
+        if (node.startsWith("t_")) {
+            let parent_id = dcit_convert_id_to_parent[node];
+            if (parent_id) {
+                if (!(parent_id in dic_client_tasks)) {
+                    dic_client_tasks[parent_id] = []
+                }
+                dic_client_tasks[parent_id].push(node.substring(2))
+            }
+        }
+    }
+    return dic_client_tasks;
+}
+
+function report_service_get_file_pdf(settings, file_name) {
+    $.ajax({
+        type: "GET",
+        // dataType: 'native',
+        url: "/api/reports/pdf_report/",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        xhrFields: {
+            responseType: 'blob'
+        },
+        data: settings,
+        cache: false,
+        traditional: true,
+        success: function(blob) {
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = file_name;
+            link.click();
+        }
+    });
+
+}
+
+function report_service_get_file_name_for_client(client_id, date_start, date_stop) {
+    let client_name = dict_convert_client_id_to_name[client_id];
+    let date_start_str = date_start.slice(6, 10) + "_" + date_start.slice(3, 5) + "_" + date_start.slice(0, 2)
+    let date_stop_str = date_stop.slice(6, 10) + "_" + date_stop.slice(3, 5) + "_" + date_stop.slice(0, 2)
+    let file_name = "report_" + client_name.replaceAll(" ", "_") + "_from_" + date_start_str + "_to_" + date_stop_str + ".pdf"
+    return file_name
+}
+
+function report_save_pdf() {
+    let dic_of_settings_temp = settings_collect();
+    let dic_of_settings = {}
+    dic_of_settings["date_start"] = dic_of_settings_temp["date_start"];
+    dic_of_settings["date_stop"] = dic_of_settings_temp["date_stop"];
+    dic_of_settings["task_id_array"] = [];
+    dic_of_settings["only_wichout_account"] = dic_of_settings["only_wichout_account"];
+    dic_of_settings["set_date_account"] = "true";
+    let dic_client_tasks = report_service_get_check_tasks();
+    for (let client_id of Object.keys(dic_client_tasks)) {
+        // let dict = {}
+        // let arr = dic_client_tasks[client_id]
+        // arr.forEach((el, index) => dict[arr.length - index] = el);
+        dic_of_settings["task_id_array_str"] = dic_client_tasks[client_id] + ","; // convert to str, else not working
+        report_service_get_file_pdf(dic_of_settings,
+            report_service_get_file_name_for_client(client_id, dic_of_settings["date_start"], dic_of_settings["date_stop"]));
+    }
+}
+
 $(document).ready(function() {
     tree_object = $('#tree').tree({
         primaryKey: 'id',
@@ -124,6 +199,9 @@ $(document).ready(function() {
     });
     $('#btnUncheckAll').on('click', function() {
         tree_object.uncheckAll();
+    });
+    $('#btnSavePDF').on('click', function() {
+        report_save_pdf();
     });
     // период формирования
     $('input[name="period"]').daterangepicker({

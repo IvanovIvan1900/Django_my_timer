@@ -176,7 +176,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'/my_timer/static/')
+STATIC_ROOT = os.path.join(BASE_DIR,'main/static/')
+MEDIA_URL  = 'media/'
+MEDIA_ROOT =  os.path.join(BASE_DIR,'main/media/')
 TEMPUS_DOMINUS_LOCALIZE = True
 TEMPUS_DOMINUS_INCLUDE_ASSETS = True
 LOGIN_REDIRECT_URL = 'my_timer:work_place'

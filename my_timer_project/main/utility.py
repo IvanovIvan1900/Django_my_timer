@@ -1,9 +1,10 @@
 import logging
-from django.core.cache import caches
 from datetime import datetime as dt
+
+from django.core.cache import caches
 from django.utils import timezone as tz
 from django.utils.timezone import get_current_timezone, make_aware
-import logging
+
 
 logger = logging.getLogger(f'django.{__name__}')
 # logger.error('test logger')
@@ -48,7 +49,5 @@ def date_convert_from_string(str_value, date_format = None):
     return dt_result
 
 def date_end_of_day(dt_in):
-    dt_result = None
-    if isinstance(dt_in, dt):
-        dt_result = dt_in.replace(hour=23, minute=59, second=59, microsecond=999)
-    return dt_result
+    return dt_in.replace(hour=23, minute=59, second=59, microsecond=999) if isinstance(dt_in, dt) else None
+
