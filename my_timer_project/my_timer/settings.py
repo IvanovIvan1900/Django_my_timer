@@ -64,8 +64,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'debugtools',
-    "debug_toolbar",
     "django_select2",
     'tempus_dominus',
     'rest_framework',
@@ -73,7 +71,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,6 +81,15 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
+
+if DEBUG:
+    INSTALLED_APPS.extend([
+    'debugtools',
+    "debug_toolbar",
+    ])
+    MIDDLEWARE.extend([
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ])
 
 ROOT_URLCONF = 'my_timer.urls'
 
@@ -122,12 +128,12 @@ WSGI_APPLICATION = 'my_timer.wsgi.application'
 # docker-compose -f /run/media/dav/share_win_linux/Pythow_Work_Dir/LearnProject/Django/MyTimer/docker-compose_postgres.yml  up 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'my_timer',
-        'USER': 'my_timer',
-        'PASSWORD': 'pgpwd4habr',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': env('ENGINE_DB'),
+        'NAME': env('NAME_DB'),
+        'USER': env('USER_DB'),
+        'PASSWORD': env('PASSWORD_DB'),
+        'HOST': env('HOST_DB'),
+        'PORT': env('PORT_DB'),
     }
 }
 

@@ -207,14 +207,21 @@ $(document).ready(function() {
     $('input[name="period"]').daterangepicker({
         opens: 'left',
         showDropdowns: true,
+        ranges: {
+            'Сегодня': [moment(), moment()],
+            'Текущий месяц': [moment().startOf('month'), moment().endOf('month')],
+            'Предыдущий месяц': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        alwaysShowCalendars: true,
         locale: {
             cancelLabel: 'Отмена',
-            applyLabel: 'Применить'
+            applyLabel: 'Применить',
+            format: 'DD.MM.YYYY',
         }
     });
-    $('input[name="period"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('DD.MM.YYYY') + ' - ' + picker.endDate.format('DD.MM.YYYY'));
-    });
+    // $('input[name="period"]').on('apply.daterangepicker', function(ev, picker) {
+    //     $(this).val(picker.startDate.format('DD.MM.YYYY') + ' - ' + picker.endDate.format('DD.MM.YYYY'));
+    // });
     // выбор килентов
     select2_clietn = $('.js-data-client-ajax').select2({
         placeholder: '-- выберите клиента --',
