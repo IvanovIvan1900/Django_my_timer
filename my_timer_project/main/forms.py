@@ -67,22 +67,10 @@ class FormChangeTask(forms.ModelForm):
     class Meta:
         model = Tasks
         fields = ['name', 'client', 'is_active', 'user', 'description', 'date_start_plan']
-        # exclude = ['user']
-        # widgets = {'user': forms.HiddenInput, 'date_start_plan':forms.DateInput(format=('%Y-%m-%d'),
-        #         attrs={ 
-        #        'placeholder': 'Select a date',
-        #        'type': 'date'
-        #       })}
-        # widgets = {'user': forms.HiddenInput, 'date_start_plan':DAV_DataFieldWidget(options={"format":"DD.MM.YYYY"})}
         widgets = {'user': forms.HiddenInput}
     def __init__(self, *args, **kwargs):
         super(FormChangeTask, self).__init__(*args, **kwargs)
-        # self.fields['date_start_plan'].required = False
         self.fields['description'].required = False
-
-    # def clean_date_start_plan(self):
-    #     a =4 
-    #     return datetime.date.today()
 
     def clean(self):
         super().clean()
@@ -122,61 +110,6 @@ class FormWokrPlaceFilter(forms.Form):
     # date_to = forms.DateField(widget=DAV_DataFieldWidget(), label="По", required= False)
     task_name = forms.CharField(max_length=100, label='Задача', required= False, widget=forms.TextInput(attrs={'style':'width:500px'}))
     client = forms.ModelChoiceField(queryset=get_qery_client_wich_cahce(Clients), widget=ClientWidget(attrs={'id':'filter_customer'}), label='Клиент', required= False, )
-
-# class ClientWidget(s2forms.ModelSelect2Widget):
-#     search_fields = [
-#         "name__icontains",
-#         "full_name_icontains",
-#     ]
-
-    # def get_queryset(self):
-    #     # original qs
-    #     qs = super().get_queryset()
-    #     return qs.filter(name__startswith=self.kwargs['name'])
-# class TaskWidget(s2forms.Select2Mixin):
-#     search_fields = [
-#         "name__icontains",
-#     ]
-#     model = Tasks
-#     empty_label = "-- выберите Задачу --"
-#     cache_qery_key = "task_cache_query"
-
-#     def __init__(self, **kwargs):
-#         super().__init__(kwargs)
-#         self.attrs = {"style": "min-width: 250px" }
-#         # self.empty_label = 'Не выбран'
-
-#     def build_attrs(self, base_attrs, extra_attrs=None):
-#         base_attrs = super().build_attrs(base_attrs, extra_attrs)
-#         base_attrs.update(
-#             {"data-minimum-input-length": 0, "data-placeholder": self.empty_label, 'data-allow-clear':'true'}
-#         )
-#         return base_attrs
-
-#     def get_queryset(self):
-#         return get_qery_active_task_wich_cahce(Tasks)
-# class TaskWidget(s2forms.Select2Widget):
-#     search_fields = [
-#         "name__icontains",
-#     ]
-#     model = Tasks
-#     empty_label = "-- выберите Задачу --"
-#     cache_qery_key = "task_cache_query"
-
-#     def __init__(self, **kwargs):
-#         super().__init__(kwargs)
-#         self.attrs = {"style": "min-width: 250px" }
-#         # self.empty_label = 'Не выбран'
-
-#     def build_attrs(self, base_attrs, extra_attrs=None):
-#         base_attrs = super().build_attrs(base_attrs, extra_attrs)
-#         base_attrs.update(
-#             {"data-minimum-input-length": 0, "data-placeholder": self.empty_label, 'data-allow-clear':'true'}
-#         )
-#         return base_attrs
-
-#     def get_queryset(self):
-#         return get_qery_active_task_wich_cahce(Tasks)
 
 class FormTestWidget(forms.Form):
     # list_of_client = ((client.id, client.name) for client in  Clients.objects.all())

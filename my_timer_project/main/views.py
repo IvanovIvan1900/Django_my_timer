@@ -1,4 +1,6 @@
 import datetime
+from datetime import datetime as dt
+
 import pytz
 # from .forms import FormTestWidget
 from django.contrib.auth.decorators import login_required
@@ -6,24 +8,24 @@ from django.contrib.auth.models import User
 from django.core.cache import caches
 from django.core.paginator import Paginator
 from django.db import connection
-from django.db.models import Max, Q, Sum, Value
+from django.db.models import F, Max, Q, Subquery, Sum, Value
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone as tz
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import get_current_timezone
-from datetime import datetime as dt
-from django.db.models import Subquery
+
 from .forms import (FormChangeClient, FormChangeTask, FormNewTask,
                     FormTameTrackerFilter, FormWokrPlaceFilter,
                     FromChangeTimeTracker, SearchForm)
 from .models import Clients, Tasks, TimeTrack
 from .pref import Pref
-from .utility import date_convert_from_string, date_end_of_day
-from django.db.models import F
+from .utility import date_convert_from_string, date_end_of_day, log_exception
+
 
 # Create your views here.
+@log_exception(None)
 @login_required
 def client_list(request):
     keyword = request.GET.get('keyword', '')
@@ -50,6 +52,7 @@ def client_list(request):
     context = {'clients': page.object_list, 'form_search':form_search, 'page':page}
     return render(request, 'my_timer_main/main/client_list.html', context)
 
+@log_exception(None)
 @login_required
 def client_edit_or_add(request, client_id = ""):
     client = None
@@ -79,12 +82,14 @@ def client_edit_or_add(request, client_id = ""):
 
     return render(request, 'my_timer_main/main/client_edit.html', {'form': form})
 
+@log_exception(None)
 @login_required
 def client_delete(request, client_id = ""):
     client = get_object_or_404(Clients, pk=client_id)
     client.delete()
     return HttpResponseRedirect(reverse('my_timer:client_list'))
 
+@log_exception(None)
 @login_required
 def task_list(request):
     keyword = request.GET.get('keyword', '')
@@ -111,6 +116,7 @@ def task_list(request):
     context = {'tasks': page.object_list, 'form_search':form_search, 'page':page}
     return render(request, 'my_timer_main/main/task_list.html', context)
 
+@log_exception(None)
 @login_required
 def task_edit_or_add(request, task_id = ""):
     task = None
@@ -140,12 +146,14 @@ def task_edit_or_add(request, task_id = ""):
 
     return render(request, 'my_timer_main/main/task_edit.html', {'form': form})
 
+@log_exception(None)
 @login_required
 def task_delete(request, task_id):
     task = get_object_or_404(Tasks, pk=task_id)
     task.delete()
     return HttpResponseRedirect(reverse('my_timer:task_list'))
 
+@log_exception(None)
 @login_required
 def work_place(request):
     # last_tasks = Tasks.objects.
@@ -313,6 +321,7 @@ def work_place(request):
             'form_new_task':form_new_task, 'form_search': form_search, "list_last_time_track":list_last_time_track,}
     return render(request, 'my_timer_main/main/work_place.html', context)
 
+@log_exception(None)
 @login_required
 def action_wich_tasks(request, action, id):
     """Выполняет действия с задачей
@@ -340,6 +349,7 @@ def action_wich_tasks(request, action, id):
     
     return HttpResponseRedirect(reverse('my_timer:work_place'))
 
+@log_exception(None)
 @login_required
 def report_task_list(request):
     return render(request, 'my_timer_main/main/report_tasks_clients.html')
@@ -350,6 +360,7 @@ def report_task_list(request):
 #     request.session['client_filter'] = filter_text
 #     return HttpResponseRedirect(reverse('my_timer:client_list'))
 
+@log_exception(None)
 @login_required
 def time_track_list(request):
     cache_key_filter = 'time_track_list_cache_filter'
@@ -404,6 +415,7 @@ def time_track_list(request):
     context = {'time_trackers': time_trackers, 'form_search':form_search, }
     return render(request, 'my_timer_main/main/time_track_list.html', context)
 
+@log_exception(None)
 @login_required
 def time_track_edit_or_add(request, time_track_id = ""):
     time_track = None

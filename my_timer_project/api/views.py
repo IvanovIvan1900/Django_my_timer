@@ -19,8 +19,11 @@ from tomlkit import array
 from api.serializers import TimeTrackerSerializer
 # Create your views here.
 from api.utily import html_to_pdf
+from my_timer_project.main.utility import log_exception
 
 logger = logging.getLogger(f'django.{__name__}')
+
+@log_exception(None)
 @api_view(['GET', 'PUT'])
 @permission_classes((IsAuthenticated,))
 def TimeTreckerDetalView(request, pk):
@@ -40,6 +43,7 @@ def TimeTreckerDetalView(request, pk):
         serializer = TimeTrackerSerializer(tt, many=True)
         return Response(serializer.data)
 
+@log_exception(None)
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def TimeTreckerList(request):
@@ -47,6 +51,7 @@ def TimeTreckerList(request):
     serializer = TimeTrackerSerializer(tt, many=True)
     return Response(serializer.data)
 
+@log_exception(None)
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def ClientList(request):
@@ -64,6 +69,7 @@ def ClientList(request):
     }
     return Response(data)
 
+
 def service_parse_date(date_str:str)->Optional[datetime]:
     result = None
     if date_str:
@@ -75,6 +81,7 @@ def service_parse_date(date_str:str)->Optional[datetime]:
             result = None
     return result
 
+@log_exception(None)
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def TimeTrackReport(request):
@@ -109,6 +116,7 @@ def TimeTrackReport(request):
         "dic_of_task":dic_of_task,
     })
 
+@log_exception(None)
 def check_param_is_present_and_is_not_none(request:Request, param:List[str]) -> Tuple[bool, Optional[Response]]:
     array_error = []
     succes = True
@@ -120,6 +128,7 @@ def check_param_is_present_and_is_not_none(request:Request, param:List[str]) -> 
 
     return succes, resp
 
+@log_exception(None)
 def qeury_filter_add_filter_to_query(query, settings_report):
     query = query.filter(date_stop__gte=settings_report["date_start"],
         date_stop__lte=settings_report["date_stop"],
@@ -129,6 +138,7 @@ def qeury_filter_add_filter_to_query(query, settings_report):
 
     return query
 
+@log_exception(None)
 def get_report(request:Request, type_of_result:str) -> Response:
     succes, resp = check_param_is_present_and_is_not_none(request=request, param=["date_start", "date_stop", "task_id_array_str", "set_date_account"])
     if not succes:
@@ -164,12 +174,13 @@ def get_report(request:Request, type_of_result:str) -> Response:
     else:
         return render(request, 'my_timer_main/main/report.html', context)
 
-
+@log_exception(None)
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def get_report_pdf(request):
     return get_report(request=request, type_of_result="pdf")
 
+@log_exception(None)
 @api_view(['GET'])
 # @permission_classes((IsAuthenticated,))
 def get_report_html(request):
