@@ -57,6 +57,7 @@
                         <th scope="col" style="width: 5%;">Активная</th>
                         <th scope="col" style="width: 35%;">Имя задачи</th>
                         <th scope="col" class="width_min" style="width: 20%;">Имя клиента</th>
+                        <th scope="col" style="width: 5%;">Дата счета</th>
                         <th scope="col" style="width: 5%;">Дата начала</th>
                         <th scope="col" style="width: 5%;">Дата окончания</th>
                         <th scope="col" class="width_max" style="width: 5%;">Время работы</th>
@@ -91,6 +92,7 @@
                                     <td>
                                         <a href="{% url 'my_timer:client_edit' client_id=time_track.task.client.pk %}">{{ time_track.task.client.name }}
                                         </td>
+                                        <td>{{ time_track.date_account|date:'d-m' }}</td>
                                         <td>{{ time_track.date_start|date:'d-m  H:i' }}</td>
                                         <td>{{ time_track.date_stop|date:'d-m  H:i' }}</td>
                                         <td id='duration_id_{{ time_track.task.pk }}'

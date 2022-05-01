@@ -182,7 +182,7 @@ def get_report_pdf(request):
 
 @log_exception(None)
 @api_view(['GET'])
-# @permission_classes((IsAuthenticated,))
+@permission_classes((IsAuthenticated,))
 def get_report_html(request):
     return get_report(request=request, type_of_result="html")
 

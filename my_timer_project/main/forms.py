@@ -1,55 +1,17 @@
 import datetime
+
+from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import fields
-from .models import Clients
-from django import forms
-from .models import Tasks
-from .models import TimeTrack
-from django_select2 import forms as s2forms
-from .utility import get_qery_client_wich_cahce, get_qery_active_task_wich_cahce
-from tempus_dominus.widgets import DatePicker
-from django.core.exceptions import ValidationError
+from pkg_resources import require
+from main.widgets import (ClientWidget, DAV_DataFieldWidget, DAV_DateTimePicker)
 
-#=================================================
-#+++++++++++++MY WIDHET++++++++++++++++++++++++++
-class ClientWidget(s2forms.ModelSelect2Widget):
-    search_fields = [
-        "name__icontains",
-        "full_name__icontains",
-    ]
-    model = Clients
-    empty_label = "-- выберите клиента --"
-    cache_qery_key = "client_cache_query"
+from .models import Clients, Tasks, TimeTrack
+from .utility import (get_qery_active_task_wich_cahce,
+                      get_qery_client_wich_cahce)
 
-    def __init__(self, **kwargs):
-        super().__init__(kwargs)
-        self.attrs = {"style": "min-width: 250px" }
-        if kwargs.get('attrs', {}).get('id', None):
-            self.attrs['id'] = kwargs.get('attrs', {}).get('id', None)
-        # self.empty_label = 'Не выбран'
-
-    def build_attrs(self, base_attrs, extra_attrs=None):
-        base_attrs = super().build_attrs(base_attrs, extra_attrs)
-        base_attrs.update(
-            {"data-minimum-input-length": 0, "data-placeholder": self.empty_label, 'data-allow-clear':'true'}
-        )
-        return base_attrs
-
-    def get_queryset(self):
-        return get_qery_client_wich_cahce(Clients)
-
-class DAV_DataFieldWidget(DatePicker):
-    dav_options={'buttons':{'showToday':True, 'showClear':True, 'showClose':True}}
-    def __init__(self, attrs=None, options=None, format=None):
-        if isinstance(options , dict):
-            options = {**options, **self.dav_options}
-        else:
-            options = self.dav_options
-        super().__init__(attrs=attrs, options=options, format=format)
-
-#-------------MY WIDHET--------------------------
-#=================================================
 
 class FormChangeClient(forms.ModelForm):
     class Meta:
@@ -64,10 +26,12 @@ class SearchForm(forms.Form):
 class FormChangeTask(forms.ModelForm):
     date_start_plan = forms.DateField(required=False,
          label='Дата начала (План)', widget=DAV_DataFieldWidget(), input_formats=("%d.%m.%Y",))
+
     class Meta:
         model = Tasks
         fields = ['name', 'client', 'is_active', 'user', 'description', 'date_start_plan']
         widgets = {'user': forms.HiddenInput}
+
     def __init__(self, *args, **kwargs):
         super(FormChangeTask, self).__init__(*args, **kwargs)
         self.fields['description'].required = False
@@ -92,12 +56,37 @@ class FormNewTask(forms.Form):
     # client = forms.ChoiceField(widget=ClientWidget(), required=True, label='Клиент')
 
 class FromChangeTimeTracker(forms.ModelForm):
+    date_start= forms.DateTimeField(
+        input_formats=['%d.%m.%Y %H:%M'], 
+        widget=DAV_DateTimePicker(format='%d.%m.%Y %H:%M'),
+        label='Дата начала'
+
+    )
+    date_stop= forms.DateTimeField(
+        input_formats=['%d.%m.%Y %H:%M'], 
+        widget=DAV_DateTimePicker(format='%d.%m.%Y %H:%M'),
+        label='Дата окончания'
+    )
+
+    date_account = forms.DateField(
+        input_formats=('%d.%m.%Y',), 
+        required= False,
+        widget=DAV_DataFieldWidget(),
+        label='Дата счета'
+
+    )
+
+    duration_sec = forms.CharField(label='Продолжительность', required = False)
     class Meta:
         model = TimeTrack
-        fields = ['task', 'date_start', 'date_stop', 'duration_sec', 'is_active', 'user']
+        fields = ['task', 'date_start', 'date_stop', 'duration_sec', 'is_active', 'user', 'date_account']
+        labels = {'task': 'Задача', 'duration_sec':'Продолжительность', 'is_active':'Задача активна'}
         # exclude = ['user']
         widgets = {'user': forms.HiddenInput}
 
+    def clean_duration_sec(self):
+        return (self.cleaned_data['date_stop'] - self.cleaned_data['date_start']).total_seconds()
+        
 class FormTameTrackerFilter(forms.Form):
     date_from = forms.DateField(widget=DAV_DataFieldWidget(), label="C", required= False)
     date_to = forms.DateField(widget=DAV_DataFieldWidget(), label="По", required= False)
