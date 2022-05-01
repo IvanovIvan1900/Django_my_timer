@@ -1,0 +1,17 @@
+{% include "django/forms/widgets/input.html" %}
+<script>
+    $(function() {
+      $('input[name="{{ widget.name }}"]').daterangepicker({
+        timePicker: true,
+        timePickerIncrement: true,
+        timePicker24Hour: true,
+        timePickerSeconds: false,
+        singleDatePicker: true,
+        locale: {
+            cancelLabel: 'Отмена',
+            applyLabel: 'Применить',
+            format: 'DD.MM.YYYY HH:mm',
+        },
+      });
+    });
+    </script>
