@@ -26,10 +26,13 @@ class SearchForm(forms.Form):
 class FormChangeTask(forms.ModelForm):
     date_start_plan = forms.DateField(required=False,
          label='Дата начала (План)', widget=DAV_DataFieldWidget(), input_formats=("%d.%m.%Y",))
+    client = forms.ModelChoiceField(queryset=get_qery_client_wich_cahce(Clients), widget=ClientWidget(attrs={'id':'add_task_customer'}),
+         label='Клиент', required= True)
 
     class Meta:
         model = Tasks
         fields = ['name', 'client', 'is_active', 'user', 'description', 'date_start_plan']
+        labels = {'name': 'Наименование', 'is_active':'Активна', 'description':'Описание'}
         widgets = {'user': forms.HiddenInput}
 
     def __init__(self, *args, **kwargs):

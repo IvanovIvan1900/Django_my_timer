@@ -3,118 +3,157 @@
 {% load dav_filter %}
 {% block title %}Рабочее место{% endblock %}
 {% load static %}
-{%block head %}
+{% block head %}
     {# Include FontAwesome; required for icon display #}
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
-
+    <link rel="stylesheet"
+          href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css">
     {# Include Bootstrap 4 and jQuery #}
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {{ form_search.media }}
     <script src="{% static 'main/work_place.js' %}"></script>
     <script src="{% static 'main/main.js' %}"></script>
-    {% endblock %}
-{%block menu_block%}
-<link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}">
-<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
-  {% comment %} <div class="container-fluid mb-2"> {% endcomment %}
-    <div class="row">
-      <form class="col-md-auto form-inline" method="post">
-        {% csrf_token %}
-        {% bootstrap_form form_new_task show_label=True %}
-        {% bootstrap_button  button_class="btn btn-outline-success" content='Добавить и запустить' button_type='submit' name="add_button" value="search" %}
-      </form>
+{% endblock %}
+{% block menu_block %}
+    <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
+        {% comment %} <div class="container-fluid mb-2"> {% endcomment %}
+        <div class="row">
+            <form class="col-md-auto form-inline" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form_new_task show_label=True %}
+                {% bootstrap_button  button_class="btn btn-outline-success" content='Добавить и запустить' button_type='submit' name="add_button" value="search" %}
+            </form>
         </div>
-  {% comment %} </div> {% endcomment %}
-</nav>
+        {% comment %} </div> {% endcomment %}
+    </nav>
 {% endblock %}
 {% block content %}
-<div>
-{% if active_time_treket %}
-  <fieldset>
-  <legend >Активные задачи</legend>
-  <table class="table table-hover table table-striped table-hover" id="table_active_task">
-    <thead>
-        <tr>
-          <th scope="col" style="width: 50%;">Задача</th>
-          <th scope="col" style="width: 25%;">Клиент</th>
-          <th scope="col" style="width: 10%;">Начало</th>
-          <th scope="col" style="width: 10%;">Длительность</th>
-          <th scope="col" style="width: 5%;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for time_tracker in active_time_treket %}
-        <tr>
-          <td><a href="#">{{ time_tracker.task.name }}</td>
-            <td><a href="#">{{ time_tracker.task.client.name }}</td>
-              <td>{{ time_tracker.date_start|date:'d-m  H:i' }}</td>
-                <td id='date_start_id_{{time_tracker.id}}'><input type="hidden" value='{{time_tracker.date_start|date:"Y-m-d_H:i:s"}}'>{{ time_tracker.duration_sec|sec_to_hh_mm }}</td>
-                  <td><a href="{% url 'my_timer:action_wich_tasks' action='stop' id=time_tracker.pk %}" class="btn btn-outline-danger btn-circle" role="button"><img src="{% static 'main/ico_stop.png' %}"
-                    class="ico-button" alt="Остановить задачу"></a>
-                    </td>
-            </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </fieldset>
-{% endif%}
-</div>
-<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
-  <div class="row">
-  <form class="col-md-auto form-inline">
-  {% bootstrap_form form_search %}
-  {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
-  {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
-  </form>
-</nav>
-<div>
-  <fieldset>
-    <legend >Недавние задачи</legend>
-    <table class="table table-hover table table-striped table-hover">
-    <thead>
-        <tr>
-          <th scope="col" style="width: 50%;">Задача</th>
-          <th scope="col" style="width: 25%;">Клиент</th>
-          <th scope="col" style="width: 5%;">Дней назад</th>
-          <th scope="col" style="width: 5%;">Дата план</th>
-          <th scope="col" style="width: 10%;">Текущее время (HH:MM)</th>
-          <th scope="col" style="width: 5%;"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if array_dic_of_data_last_tasks %}
-        {% for dic_of_data in array_dic_of_data_last_tasks %}
-        {% if dic_of_data.is_plan %}
-          {% if dic_of_data.is_outdate %}
-              <tr class="table-danger">
-            {% else %}
-              <tr class="table-warning">
-            {% endif %}
-    
-        {% else %}
-        <tr>
-          {% endif %}
-          <td><a href="{% url 'my_timer:task_edit' task_id=dic_of_data.task_id %}">{{ dic_of_data.task_name }}</td>
-            <td><a href="{% url 'my_timer:client_edit' client_id=dic_of_data.client_id %}">{{ dic_of_data.client_name }}</td>
-              <td>{{ dic_of_data.diff_day }}</td>
-              <td>{{ dic_of_data.date_start_plan|date:"d.m.Y" }}</td>
-                <td>{{ dic_of_data.task_duration|sec_to_hh_mm}}</td>
-                  <td>
-                    <div class="container text-center button_container">
-                      <a href="{% url 'my_timer:action_wich_tasks' action='start' id=dic_of_data.task_id %}" class="btn btn-outline-success btn-circle" role="button" ><img src="{% static 'main/ico_play.png' %}"
-                        class="ico-button" alt="Запуск задачи" ></a>
-                          <a href="{% url 'my_timer:time_track_list_filter' %}?task_name={{dic_of_data.task_name}}&client={{dic_of_data.client_id}}&search_button='search' " class="btn btn-outline-warning btn-circle " role="button" ><img src="{% static 'main/ico_history.png' %}"
-                            class="ico-button" alt="История по задаче"></a>
-                          <a href="{% url 'my_timer:action_wich_tasks' action='task_done' id=dic_of_data.task_id %}" class="btn btn-outline-danger btn-circle " role="button" ><img src="{% static 'main/ico_checked.png' %}"
-                            class="ico-button" alt="Пометить выполненной"></a>
-                    </div>
-                    </tr>
-        {% endfor %}
-        {% endif %}
-      </tbody>
-</table>
-</fieldset>
-</div>
-{% endblock %}
+    <div>
+        {% if active_time_treket %}
+            <fieldset>
+                <legend >
+                    Активные задачи
+                </legend>
+                <table class="table table-hover table table-striped table-hover"
+                       id="table_active_task">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 50%;">Задача</th>
+                            <th scope="col" style="width: 25%;">Клиент</th>
+                            <th scope="col" style="width: 10%;">Начало</th>
+                            <th scope="col" style="width: 10%;">Длительность</th>
+                            <th scope="col" style="width: 5%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for time_tracker in active_time_treket %}
+                            <tr>
+                                <td>
+                                    <a href="#">{{ time_tracker.task.name }}
+                                    </td>
+                                    <td>
+                                        <a href="#">{{ time_tracker.task.client.name }}
+                                        </td>
+                                        <td>{{ time_tracker.date_start|date:'d-m  H:i' }}</td>
+                                        <td id='date_start_id_{{ time_tracker.id }}'>
+                                            <input type="hidden" value='{{ time_tracker.date_start|date:"Y-m-d_H:i:s" }}'>
+                                            {{ time_tracker.duration_sec|sec_to_hh_mm }}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'my_timer:action_wich_tasks' action='stop' id=time_tracker.pk %}"
+                                               class="btn btn-outline-danger btn-circle"
+                                               role="button">
+                                                <img src="{% static 'main/ico_stop.png' %}"
+                                                     class="ico-button"
+                                                     alt="Остановить задачу">
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </fieldset>
+                {% endif %}
+            </div>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
+                <div class="row">
+                    <form class="col-md-auto form-inline">
+                        {% bootstrap_form form_search %}
+                        {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
+                        {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
+                    </form>
+                </nav>
+                <div>
+                    <fieldset>
+                        <legend >
+                            Недавние задачи
+                        </legend>
+                        <table class="table table-hover table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width: 50%;">Задача</th>
+                                    <th scope="col" style="width: 25%;">Клиент</th>
+                                    <th scope="col" style="width: 5%;">Дней назад</th>
+                                    <th scope="col" style="width: 5%;">Дата план</th>
+                                    <th scope="col" style="width: 10%;">Текущее время (HH:MM)</th>
+                                    <th scope="col" style="width: 5%;"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if array_dic_of_data_last_tasks %}
+                                    {% for dic_of_data in array_dic_of_data_last_tasks %}
+                                        {% if dic_of_data.is_plan %}
+                                            {% if dic_of_data.is_outdate %}
+                                                <tr class="table-danger">
+                                                {% else %}
+                                                    <tr class="table-warning">
+                                                    {% endif %}
+                                                {% else %}
+                                                    <tr>
+                                                    {% endif %}
+                                                    <td>
+                                                        <a href="{% url 'my_timer:task_edit' task_id=dic_of_data.task_id %}">{{ dic_of_data.task_name }}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{% url 'my_timer:client_edit' client_id=dic_of_data.client_id %}">{{ dic_of_data.client_name }}
+                                                            </td>
+                                                            <td>{{ dic_of_data.diff_day }}</td>
+                                                            <td>{{ dic_of_data.date_start_plan|date:"d.m.Y" }}</td>
+                                                            <td>{{ dic_of_data.task_duration|sec_to_hh_mm }}</td>
+                                                            <td>
+                                                                <div class="container text-center button_container">
+                                                                    <a href="{% url 'my_timer:action_wich_tasks' action='start' id=dic_of_data.task_id %}"
+                                                                       class="btn btn-outline-success btn-circle"
+                                                                       role="button">
+                                                                        <img src="{% static 'main/ico_play.png' %}"
+                                                                             class="ico-button"
+                                                                             alt="Запуск задачи">
+                                                                    </a>
+                                                                    <a href="{% url 'my_timer:time_track_list_filter' %}?task_name={{ dic_of_data.task_name }}&client={{ dic_of_data.client_id }}&search_button='search' "
+                                                                       class="btn btn-outline-warning btn-circle "
+                                                                       role="button">
+                                                                        <img src="{% static 'main/ico_history.png' %}"
+                                                                             class="ico-button"
+                                                                             alt="История по задаче">
+                                                                    </a>
+                                                                    <a href="{% url 'my_timer:action_wich_tasks' action='task_done' id=dic_of_data.task_id %}"
+                                                                       class="btn btn-outline-danger btn-circle "
+                                                                       role="button">
+                                                                        <img src="{% static 'main/ico_checked.png' %}"
+                                                                             class="ico-button"
+                                                                             alt="Пометить выполненной">
+                                                                    </a>
+                                                                </div>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </fieldset>
+                                    </div>
+                                {% endblock %}

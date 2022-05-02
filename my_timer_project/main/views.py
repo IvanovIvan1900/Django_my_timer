@@ -139,9 +139,9 @@ def task_edit_or_add(request, task_id = ""):
     # if a GET (or any other method) we'll create a blank form
     else:
         if task:
-            form = FormChangeTask(initial={'user': request.user.pk}, instance=task)
+            form = FormChangeTask(initial={'user': request.user.pk, 'is_active':True}, instance=task)
         else:
-            form = FormChangeTask(initial={'user': request.user.pk})
+            form = FormChangeTask(initial={'user': request.user.pk, 'is_active':True})
 
 
     return render(request, 'my_timer_main/main/task_edit.html', {'form': form})
