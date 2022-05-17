@@ -1,42 +1,60 @@
 version: "3.9"
+
+volumes:
+  pg_mytimer_data_dev:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/dav/PythonWorkDir/LearnProject/MyTimer/bd_data/db/
+      o: bind  
+
+  pg_admin_data_dev:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/dav/PythonWorkDir/LearnProject/MyTimer/bd_data/pgadmin/
+      o: bind  
+
 services:
   postgres:
     container_name: postgres_container
-    image: postgres:13.3
+    image: postgres:14
     environment:
-      POSTGRES_DB: "my_timer"
-      POSTGRES_USER: "my_timer"
-      POSTGRES_PASSWORD: "pgpwd4habr"
+      # POSTGRES_DB: "my_timer"
+      # POSTGRES_USER: "my_timer"
+      # POSTGRES_PASSWORD: "pgpwd4habr"
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
-      - /home/dav/my_timer_bd/bd_data/Init Database:/docker-entrypoint-initdb.d
-      - /home/dav/my_timer_bd/bd_data:/var/lib/postgresql/data
+      - pg_mytimer_data_dev:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U my_timer -d my_timer"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -U my_timer -d my_timer"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 10s
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          cpus: '1'
-          memory: 4G
+          cpus: '0.5'
+          memory: 1G
+    env_file:
+          - ./my_timer_project/my_timer/.env
+
     networks:
-      - postgres
+      - my_timer_dev
 
   pgadmin:
     container_name: pgadmin_container
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:latest
     environment:
       PGADMIN_DEFAULT_EMAIL: "habrpguser@habr.com"
       PGADMIN_DEFAULT_PASSWORD: "656050"
       PGADMIN_CONFIG_SERVER_MODE: "False"
     volumes:
-      - /home/dav/my_timer_bd/bd_data/pgadmin:/var/lib/pgadmin
+      - pg_admin_data_dev:/var/lib/pgadmin
     ports:
       - "5050:80"
     restart: unless-stopped
@@ -46,7 +64,10 @@ services:
           cpus: '0.5'
           memory: 1G
     networks:
-      - postgres
+      - my_timer_dev
+    depends_on:
+          - postgres
+
 networks:
-  postgres:
+  my_timer_dev:
     driver: bridge

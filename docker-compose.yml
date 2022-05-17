@@ -1,0 +1,85 @@
+version: '3.9'
+
+# volumes:
+#   pg_mytimer_data:/home/dav/WorkMyProject/my_timer_bd/
+volumes:
+  pg_mytimer_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/dav/WorkMyProject/my_timer_bd/
+      o: bind    
+  static_volume:
+  
+services:
+  postgres:
+    container_name: pg_my_timer_prod
+    image: postgres:14
+    environment:
+      # POSTGRES_DB: "my_timer"
+      # POSTGRES_USER: "my_timer_user"
+      # POSTGRES_PASSWORD: "pgusermytimer"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - pg_mytimer_data:/var/lib/postgresql/data
+    # ports:
+    #   - "5445:5432"
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U my_timer_user -d my_timer"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+    env_file:
+          - ./my_timer_project/my_timer/.env.prod
+    networks:
+      - my_timer_work
+
+  my_timer_prod:
+    container_name: my_timer_prod
+    image: my_timer_prod
+    build:
+      context: ./my_timer_project
+      dockerfile: Dockerfile
+    command: gunicorn my_timer.wsgi:application --bind 0.0.0.0:8000
+    # ports:
+    #   - 8100:8100
+    volumes:
+          - static_volume:/home/app/web/staticfiles
+    expose:
+      - 8000
+    networks:
+      - my_timer_work
+    depends_on:
+          - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 0.5G
+    env_file:
+          - ./my_timer_project/my_timer/.env.prod
+
+  nginx:
+    container_name: my_timer_nginx
+    build: ./nginx
+    ports:
+      - 1337:80
+    volumes:
+          - static_volume:/home/app/web/staticfiles
+    networks:
+      - my_timer_work
+    depends_on:
+      - my_timer_prod
+
+networks:
+  my_timer_work:
+    driver: bridge

@@ -1,12 +1,14 @@
 # importing the necessary libraries
-from io import BytesIO
-import os
+# import os
+# from io import BytesIO
+
+import pdfkit
 from django.conf import settings
+# from django.contrib.staticfiles import finders
 from django.http import HttpResponse
 from django.template.loader import get_template
-from xhtml2pdf import pisa  
-from django.contrib.staticfiles import finders
-import pdfkit
+# from xhtml2pdf import pisa
+
 # defining the function to convert an HTML file to a PDF file
 # https://qna.habr.com/q/536178?
 # def fetch_pdf_resources(uri, rel):

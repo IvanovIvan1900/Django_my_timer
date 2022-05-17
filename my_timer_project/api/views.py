@@ -1,25 +1,25 @@
+import logging
 from collections import defaultdict
 from datetime import datetime
 from functools import partial
-import logging
 from typing import List, Optional, Tuple
-from rest_framework.request import Request
 
 import pytz
 from django.db.models import Sum
 from django.shortcuts import get_object_or_404, render
 from main.models import Clients, TimeTrack
+from main.utility import log_exception
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
-from tomlkit import array
+# from tomlkit import array
 
 from api.serializers import TimeTrackerSerializer
 # Create your views here.
 from api.utily import html_to_pdf
-from my_timer_project.main.utility import log_exception
 
 logger = logging.getLogger(f'django.{__name__}')
 

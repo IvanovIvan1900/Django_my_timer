@@ -6,6 +6,7 @@ from django.core.cache import caches
 from django.utils import timezone as tz
 from django.utils.timezone import get_current_timezone, make_aware
 
+import sys
 
 logger = logging.getLogger(f'django.{__name__}')
 # logger.error('test logger')
@@ -27,6 +28,9 @@ def log_exception(name_log:str = None):
     
 @log_exception(None)
 def get_qery_client_wich_cahce(class_model):
+    # иначе при миграции он пытается выполнить запрос
+    if ('makemigrations' in sys.argv or 'migrate' in sys.argv):
+        return None
     cache_qery_key = "client_qery_cache"
     if caches['mem_cache'].has_key(cache_qery_key):
         return caches['mem_cache'].get(cache_qery_key)

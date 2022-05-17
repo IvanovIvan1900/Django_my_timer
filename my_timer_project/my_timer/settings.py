@@ -21,7 +21,9 @@ env = environ.Env(
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, 'my_timer/.env'))
+file_name_env = os.path.join(BASE_DIR, 'my_timer/.env')
+if os.path.isfile(file_name_env):
+    environ.Env.read_env(file_name_env)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -32,7 +34,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1',]
 DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.versions.VersionsPanel',
     'debug_toolbar.panels.timer.TimerPanel',
@@ -182,7 +184,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'main/static/')
+if DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR,'main/static/')
+else:
+    STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL  = 'media/'
 MEDIA_ROOT =  os.path.join(BASE_DIR,'main/media/')
 TEMPUS_DOMINUS_LOCALIZE = True
@@ -224,7 +229,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR,'django-site.log'),
+            'filename': os.path.join(BASE_DIR,'logs','django-site.log'),
             'maxBytes': 1048576,
             'backupCount': 10,
             'formatter': 'simple',
