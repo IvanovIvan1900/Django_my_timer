@@ -146,7 +146,7 @@ def get_report(request:Request, type_of_result:str) -> Response:
     settings_report = {"date_start": service_parse_date(request.query_params.get("date_start", None))}
     settings_report["date_stop"] = service_parse_date(request.query_params.get("date_stop", None)).replace(hour=23, minute=59, second=59)
     settings_report["task_id_array"] = [int(elem) for elem in request.query_params.get("task_id_array_str", "").split(",") if elem]
-    settings_report["only_wichout_account"] = request.query_params.get("only_wichout_account", "") in "true,True, 1"
+    settings_report["only_wichout_account"] = request.query_params.get("only_wichout_account", "false") in "true,True,1"
     settings_report["set_date_account"] = request.query_params.get("set_date_account", "") in "true,True, 1"
 
     t_query = TimeTrack.objects.values("task__name", "task__client__full_name")
@@ -165,7 +165,7 @@ def get_report(request:Request, type_of_result:str) -> Response:
     if settings_report["set_date_account"]:
         date_now = datetime.now(pytz.utc).date()
         r_query = TimeTrack.objects
-        settings_report["only_wichout_account"] = True
+        # settings_report["only_wichout_account"] = True
         r_query = qeury_filter_add_filter_to_query(r_query, settings_report=settings_report)
         r_query.update(date_account=date_now)
 

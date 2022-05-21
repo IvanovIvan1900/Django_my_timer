@@ -11,6 +11,7 @@ volumes:
       type: none
       device: /home/dav/WorkMyProject/my_timer_bd/
       o: bind
+
   my_timer_logs:
     driver: local
     driver_opts:
@@ -18,14 +19,21 @@ volumes:
       device: /home/dav/WorkMyProject/my_timer_bd/logs/
       o: bind
 
-  static_volume:
+  my_timer_statics:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/dav/WorkMyProject/my_timer_bd/statics/
+      o: bind
+
+  # static_volume:
   
 services:
   pg_my_timer_prod:
     container_name: pg_my_timer_prod
     image: postgres:14
     environment:
-      COMPOSE_PROJECT_NAME: "prod"
+      # COMPOSE_PROJECT_NAME: "prod"
       # POSTGRES_DB: "my_timer"
       # POSTGRES_USER: "my_timer_user"
       # POSTGRES_PASSWORD: "pgusermytimer"
@@ -64,7 +72,7 @@ services:
     #   - 8100:8100
     volumes:
       - my_timer_logs:/home/app/web/logs
-      - static_volume:/home/app/web/staticfiles
+      - my_timer_statics:/home/app/web/staticfiles
     expose:
       - 8000
     networks:
@@ -85,7 +93,7 @@ services:
     ports:
       - 1337:80
     volumes:
-          - static_volume:/home/app/web/staticfiles
+          - my_timer_statics:/home/app/web/staticfiles
     networks:
       - my_timer_work
     depends_on:

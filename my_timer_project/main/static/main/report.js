@@ -30,6 +30,8 @@ function settings_collect() {
     only_wichout_account = document.querySelector("[name='only_wichout_account']");
     if ((only_wichout_account != null) && (only_wichout_account.checked)) {
         map_settings["only_wichout_account"] = "true";
+    } else {
+        map_settings["only_wichout_account"] = "false";
     }
     return map_settings
 }
@@ -158,7 +160,7 @@ function report_save_pdf() {
     dic_of_settings["date_start"] = dic_of_settings_temp["date_start"];
     dic_of_settings["date_stop"] = dic_of_settings_temp["date_stop"];
     dic_of_settings["task_id_array"] = [];
-    dic_of_settings["only_wichout_account"] = dic_of_settings["only_wichout_account"];
+    dic_of_settings["only_wichout_account"] = dic_of_settings_temp["only_wichout_account"];
     dic_of_settings["set_date_account"] = "true";
     let dic_client_tasks = report_service_get_check_tasks();
     for (let client_id of Object.keys(dic_client_tasks)) {

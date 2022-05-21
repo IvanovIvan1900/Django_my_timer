@@ -3,7 +3,7 @@
 ###########
 
 # pull official base image
-FROM python:3.10.4-alpine3.15 as builder
+FROM python:3.10.4-slim-bullseye as builder
 
 # set work directory
 WORKDIR /usr/src/app
@@ -13,8 +13,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install psycopg2 dependencies
-RUN apk update \
-    && apk add postgresql-dev gcc python3-dev musl-dev
+RUN apt-get update \
+    && apt-get install -y gcc python3-dev musl-dev
 
 # lint
 RUN pip install --upgrade pip
@@ -32,13 +32,13 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 
 # pull official base image
-FROM python:3.10.4-alpine3.15
+FROM python:3.10.4-slim-bullseye
 
 # create directory for the app user
 RUN mkdir -p /home/app
 
 # create the app user
-RUN addgroup -S app && adduser -S app -G app
+RUN addgroup --system app && adduser --system app --ingroup app
 
 # create the appropriate directories
 ENV HOME=/home/app
@@ -48,7 +48,13 @@ RUN mkdir $APP_HOME/staticfiles
 WORKDIR $APP_HOME
 
 # install dependencies
-RUN apk update && apk add libpq
+RUN apt-get update \
+     && apt -y install wkhtmltopdf
+
+# COPY ./../wkhtmltopdf_distr/wkhtmltopdf /bin/
+# COPY ./../wkhtmltopdf_distr/simsun.ttc /usr/share/fonts/chinese/TrueType/
+# COPY ./../wkhtmltopdf_distr/simsun.ttf /usr/share/fonts/chinese/TrueType/ 
+
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --no-cache /wheels/*
@@ -60,6 +66,13 @@ RUN chmod +x  $APP_HOME/entrypoint.prod.sh
 
 # copy project
 COPY . $APP_HOME
+
+# copy wkhtmltopdf
+# RUN mv ./wkhtmltopdf_distr/wkhtmltopdf /bin/
+# RUN mv ./wkhtmltopdf_distr/simsun.ttc /usr/share/fonts/chinese/TrueType/
+# RUN mv ./wkhtmltopdf_distr/simsun.ttf /usr/share/fonts/chinese/TrueType/ 
+# RUN chmod +x /bin/wkhtmltopdf 
+# RUN mkdir -p /usr/share/fonts/chinese/TrueType/
 
 # chown all the files to the app user
 RUN chown -R app:app $APP_HOME
