@@ -1,5 +1,5 @@
 from django.urls import path, re_path, include
-from .views import client_list, report_task_list
+from .views import client_list, report_task_list, time_track_delete
 from django.conf import settings 
 from django.views.decorators.cache import never_cache
 from django.conf.urls.static import static
@@ -33,6 +33,7 @@ urlpatterns = [
     re_path(r'^time_track_list_filter/$', time_track_list, name = 'time_track_list_filter'),
     path('time_track_list/', time_track_list, name = 'time_track_list'),
     path('time_track_edit/<int:time_track_id>/', time_track_edit_or_add, name = 'time_track_edit'),
+    path('time_track_delete/<int:time_track_id>/', time_track_delete, name = 'time_track_delete'),
     path('time_track_add/', time_track_edit_or_add, name = 'time_track_add'),
     path('action_wich_taks/<str:action>/<int:id>', action_wich_tasks, name = 'action_wich_tasks'),
     # path(r'^select2/', include('select2.urls')),

@@ -63,7 +63,7 @@ services:
 
   my_timer_prod:
     container_name: my_timer_prod
-    image: my_timer_prod
+    image: my_timer_prod:1.01
     build:
       context: ./my_timer_project
       dockerfile: Dockerfile
@@ -79,6 +79,7 @@ services:
       - my_timer_work
     depends_on:
           - pg_my_timer_prod
+    restart: unless-stopped
     deploy:
       resources:
         limits:
@@ -96,6 +97,7 @@ services:
           - my_timer_statics:/home/app/web/staticfiles
     networks:
       - my_timer_work
+    restart: unless-stopped
     depends_on:
       - my_timer_prod
 

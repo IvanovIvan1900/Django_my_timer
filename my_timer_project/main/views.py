@@ -445,6 +445,12 @@ def time_track_edit_or_add(request, time_track_id = ""):
 
     return render(request, 'my_timer_main/main/time_track_edit.html', {'form': form})
 
+@log_exception(None)
+@login_required
+def time_track_delete(request, time_track_id):
+    TimeTrack.objects.filter(id=time_track_id).delete()
+    return HttpResponseRedirect(reverse('my_timer:time_track_list'))
+
 # @login_required
 # def test_report(request):
 #     context= {"total_spend":100, "client_full_name":"Test", "date_start":datetime.datetime.now(),

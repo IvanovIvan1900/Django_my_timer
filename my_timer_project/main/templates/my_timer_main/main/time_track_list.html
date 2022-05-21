@@ -110,6 +110,12 @@
                                                          height="18"
                                                          alt="Редактировать">
                                                 </a>
+                                                <a href="{% url 'my_timer:time_track_delete' time_track_id=time_track.pk %}">
+                                                    <img src="{% static 'main/ico_deactive.png' %}"
+                                                         width="18"
+                                                         height="18"
+                                                         alt="Удалить">
+                                                </a>
                                             </td>
                                         </tr>
                                     {% endfor %}
