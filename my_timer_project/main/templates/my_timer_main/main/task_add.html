@@ -1,0 +1,49 @@
+{% extends "my_timer_main/layout/basic.html" %}
+{% load bootstrap4 %}
+{% block head %}
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {# Include FontAwesome; required for icon display #}
+    {% comment %} <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css"> {% endcomment %}
+    {# Include Bootstrap 4 and jQuery #}
+    {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> {% endcomment %}
+    {# Django Tempus Dominus assets are included in `{{ form.media }}` #}
+    {{ form.media }}
+{% endblock %}
+{% block title %}
+    {% comment %} {% if form.instance.pk %}
+        Редактирование задачи {{ form.instance.name }}
+{% else %} {% endcomment %}
+    Добавление задачи
+    {% comment %} {% endif %} {% endcomment %}
+{% endblock %}
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        {% bootstrap_form form layout='horizontal' %}
+        {% comment %} {% print form form.instance %} {% endcomment %}
+        {% comment %} {% if form.instance.pk %}
+            {% buttons submit='Изменить' %}{% endbuttons %}
+    {% else %} {% endcomment %}
+        {% comment %} {% buttons submit='Сохранить и закрыть' %}{% endbuttons %}
+        {% buttons submit='Сохранить' %}{% endbuttons %} {% endcomment %}
+        <div class="d-flex justify-content-center">
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button class="btn btn-primary btn-space" name="save_and_close" type="submit">Сохранить и закрыть</button>
+                </div>
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button class="btn btn-primary btn-space" name="save" type="submit">Сохранить</button>
+                </div>
+            </div>
+        </div>
+        {% comment %} <input type="submit" name="save_and_close" value="Сохранить и закрыть" />
+        <input type="submit" name="save" value="Сохранить" /> {% endcomment %}
+        {% comment %} {% endif %} {% endcomment %}
+    </form>
+{% endblock %}
