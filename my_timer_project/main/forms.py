@@ -8,10 +8,10 @@ from django.db.models import fields
 from pkg_resources import require
 from main.widgets import (ClientWidget, DAV_DataFieldWidget, DAV_DateTimePicker)
 
-from .models import Clients, Tasks, TimeTrack
+from .models import Clients, Comments, Tasks, TimeTrack
 from .utility import (get_qery_active_task_wich_cahce,
                       get_qery_client_wich_cahce)
-
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 class FormChangeClient(forms.ModelForm):
     class Meta:
@@ -109,3 +109,11 @@ class FormTestWidget(forms.Form):
     #https://pypi.org/project/django-tempus-dominus/
     date_field = forms.DateField(widget=DAV_DataFieldWidget())
     client = forms.ChoiceField(widget=ClientWidget())
+
+class FormCommentEdit(forms.ModelForm):
+
+    class Meta:
+        model = Comments
+        fields = ['task', 'content',  'user']
+        labels = {'task': 'Задача', 'content':'Содержание'}
+        widgets = {'user': forms.HiddenInput, 'task': forms.HiddenInput, 'content':CKEditorUploadingWidget(), 'created_at':forms.HiddenInput}

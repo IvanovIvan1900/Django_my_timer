@@ -69,7 +69,8 @@ INSTALLED_APPS = [
     "django_select2",
     'tempus_dominus',
     'rest_framework',
-    'corsheaders',    
+    'corsheaders',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -190,6 +191,7 @@ else:
     STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL  = 'media/'
 MEDIA_ROOT =  os.path.join(BASE_DIR,'main/media/')
+CKEDITOR_UPLOAD_PATH = os.path.join(BASE_DIR,"uploads/")
 TEMPUS_DOMINUS_LOCALIZE = True
 TEMPUS_DOMINUS_INCLUDE_ASSETS = True
 LOGIN_REDIRECT_URL = 'my_timer:work_place'

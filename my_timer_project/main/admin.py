@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Clients
+from .models import Clients, Comments
 from .models import Tasks
 from .models import TimeTrack
 # from datetime import datetime as dt
@@ -18,6 +18,12 @@ class TasksAdmin(admin.ModelAdmin):
 class TrakAdmin(admin.ModelAdmin):
     list_display = ('task', 'date_start', 'date_stop','duration_sec')
     def get_changeform_initial_data(self, request):
-        # a = dt.now()
-        # tz_a = tz.now()
         return {'date_start': tz.now()}
+
+@admin.register(Comments)
+class TrakAdmin(admin.ModelAdmin):
+    list_display = ('task', 'content', 'user')
+    readonly_fields=('created_at',)
+    def get_changeform_initial_data(self, request):
+        return {'created_at': tz.now()}
+

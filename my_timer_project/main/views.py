@@ -1,5 +1,7 @@
+from asyncio import Task
 import datetime
 from datetime import datetime as dt
+from django.views.generic.edit import UpdateView, CreateView
 
 import pytz
 # from .forms import FormTestWidget
@@ -11,12 +13,12 @@ from django.db import connection
 from django.db.models import F, Max, Q, Subquery, Sum, Value
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone as tz
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import get_current_timezone
 
-from .forms import (FormChangeClient, FormChangeTask, FormNewTask,
+from .forms import (FormChangeClient, FormChangeTask, FormCommentEdit, FormNewTask,
                     FormTameTrackerFilter, FormWokrPlaceFilter,
                     FromChangeTimeTracker, SearchForm)
 from .models import Clients, Tasks, TimeTrack
@@ -145,6 +147,40 @@ def task_edit_or_add(request, task_id = ""):
 
 
     return render(request, 'my_timer_main/main/task_edit.html', {'form': form})
+
+class TaskEdit(UpdateView):
+    class_task = FormChangeTask
+    class_comment = FormCommentEdit
+    
+
+class TaskNew(CreateView):
+    template_name = "my_timer_main/main/task_add.html"
+    url_save_and_close = reverse_lazy('my_timer:task_list')
+    model = Task
+    form_class = FormChangeTask
+    user = None
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if hasattr(self, 'object'):
+            kwargs.update({'instance': self.object})
+        kwargs.update({"initial":{'user': self.user.pk, 'is_active':True}})
+        return kwargs
+
+    def get_success_url(self):
+        if 'save_and_close' in self.request.POST:
+            return self.url_save_and_close
+        else:
+            return reverse('my_timer:task_edit', kwargs={'task_id': self.object.id})
+
+    def post(self, request, *args, **kwargs):
+        self.user = request.user
+        return super().post(self, request, *args, **kwargs)
+
+
+    def get(self, request, *args, **kwargs):
+        self.user = request.user
+        return super().get(self, request, *args, **kwargs)
 
 @log_exception(None)
 @login_required

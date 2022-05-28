@@ -100,6 +100,11 @@ services:
     restart: unless-stopped
     depends_on:
       - my_timer_prod
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 0.5G
 
 networks:
   my_timer_work:

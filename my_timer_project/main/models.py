@@ -4,6 +4,7 @@ from django.db.models import signals
 from datetime import datetime as dt
 from django.utils import timezone as tz
 from .utility import clear_cache_client, active_task_cache_client
+from ckeditor_uploader.fields import RichTextUploadingField
 # Create your models here.
 
 class Clients(models.Model):
@@ -87,4 +88,14 @@ class TimeTrack(models.Model):
                 self.is_active = False
             super().save(*args, **kwargs)  # Call the "real" save() method.
 
+class Comments(models.Model):
+    task = models.ForeignKey(Tasks, on_delete=models.CASCADE, verbose_name="Задача")
+    content = RichTextUploadingField(verbose_name='Содержание')
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True,
+            verbose_name='Дата создания')
+    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.PROTECT, db_index = True)
+    class Meta:
+        verbose_name_plural = 'Комментарии'
+        verbose_name = 'Комментарий'
+        ordering = ['created_at']
 # signals.post_init.connect(receiver=TimeTracker_post_init, sender=TimeTrack)
