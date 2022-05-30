@@ -1,34 +1,112 @@
 {% extends "my_timer_main/layout/basic.html" %}
 {% load bootstrap4 %}
 {% block head %}
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {# Include FontAwesome; required for icon display #}
     {% comment %} <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css"> {% endcomment %}
     {# Include Bootstrap 4 and jQuery #}
     {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> {% endcomment %}
     {# Django Tempus Dominus assets are included in `{{ form.media }}` #}
-    {{ form.media }}
-{% endblock %}
+    {{ form_task_edit.media }}
+{% endblock head %}
 {% block title %}
-    {% if form.instance.pk %}
-        Редактирование задачи {{ form.instance.name }}
-    {% else %}
-        Добавление задачи
-    {% endif %}
-{% endblock %}
+    Редактирование задачи {{ form_task_edit.instance.name }}
+{% endblock title %}
 {% block content %}
     <form method="post">
         {% csrf_token %}
-        {% bootstrap_form form layout='horizontal' %}
-        {% comment %} {% print form form.instance %} {% endcomment %}
-        {% if form.instance.pk %}
-            {% buttons submit='Изменить' %}{% endbuttons %}
-        {% else %}
-            {% buttons submit='Добавить' %}{% endbuttons %}
-        {% endif %}
+        {% bootstrap_form form_task_edit layout='horizontal' %}
+        <div class="d-flex justify-content-center">
+            <div class="btn-toolbar" role="toolbar">
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button class="btn btn-primary btn-space"
+                            name="task_save_and_close"
+                            type="submit">Сохранить и закрыть</button>
+                </div>
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button class="btn btn-primary btn-space" name="task_save" type="submit">Сохранить</button>
+                </div>
+            </div>
+        </div>
     </form>
-{% endblock %}
+    <div class="container-fluid border">
+        {% if array_of_comment %}
+            <div class="row d-flex justify-content-center">
+                {% comment %} <div class="col-md-8 col-lg-6"> {% endcomment %}
+                    <div class="col">
+                        <div class="card shadow-0 border" style="background-color: #f0f2f5;">
+                        <div class="card-body p-4">
+                            {% for comment in array_of_comment %}
+                                {% if comment.edit %}
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        {% bootstrap_form form_comment_edit layout='horizontal' %}
+                                        {{ form_comment_edit.media }}
+                                        <div class="d-flex justify-content-center">
+                                            <div class="btn-toolbar" role="toolbar">
+                                                <div class="btn-group mr-2" role="group" aria-label="First group">
+                                                    <button class="btn btn-primary btn-space"
+                                                            name="comment_save_and_close"
+                                                            type="submit">Сохранить и закрыть</button>
+                                                </div>
+                                                <div class="btn-group mr-2" role="group" aria-label="First group">
+                                                    <button class="btn btn-primary btn-space" name="comment_save" type="submit">Сохранить</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            {{ comment.content|safe }}
+                                            <div class="d-flex justify-content-between">
+                                                <div class="d-flex flex-row align-items-center">
+                                                    <p class="small mb-0 ms-2">
+                                                        Изменено:&nbsp;{{ comment.update_at|date:"d-m-Y  H:i:s" }}
+                                                    </p>
+                                                </div>
+                                                <div class="d-flex flex-row align-items-center">
+                                                    <a href="{% url 'my_timer:task_edit' task_id=comment.task_id comment_id=comment.comment_id %}"> Изменить </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        {% if not_has_comment_edit %}
+        <div class="row d-flex justify-content-center">
+            <div class="col">
+            <form method="post">
+                Добавить новый комментарий
+                {% csrf_token %}
+                {% bootstrap_form form_comment_edit  %}
+                {{ form_comment_edit.media }}
+                <div class="d-flex justify-content-center">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group mr-2" role="group" aria-label="First group">
+                            <button class="btn btn-primary btn-space"
+                                    name="comment_save_and_close"
+                                    type="submit">Сохранить и закрыть</button>
+                        </div>
+                        <div class="btn-group mr-2" role="group" aria-label="First group">
+                            <button class="btn btn-primary btn-space" name="comment_save" type="submit">Сохранить</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}

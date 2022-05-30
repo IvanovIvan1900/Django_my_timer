@@ -23,7 +23,7 @@ class TrakAdmin(admin.ModelAdmin):
 @admin.register(Comments)
 class TrakAdmin(admin.ModelAdmin):
     list_display = ('task', 'content', 'user')
-    readonly_fields=('created_at',)
+    readonly_fields=('update_at',)
     def get_changeform_initial_data(self, request):
-        return {'created_at': tz.now()}
+        return {'update_at': tz.now()}
 

@@ -1,7 +1,6 @@
-from asyncio import Task
 import datetime
+from asyncio import Task
 from datetime import datetime as dt
-from django.views.generic.edit import UpdateView, CreateView
 
 import pytz
 # from .forms import FormTestWidget
@@ -17,14 +16,17 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone as tz
 from django.utils.dateparse import parse_datetime
 from django.utils.timezone import get_current_timezone
+from django.views import View
+from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.edit import CreateView, ProcessFormView, UpdateView
 
-from .forms import (FormChangeClient, FormChangeTask, FormCommentEdit, FormNewTask,
-                    FormTameTrackerFilter, FormWokrPlaceFilter,
+from .forms import (FormChangeClient, FormChangeTask, FormCommentEdit,
+                    FormNewTask, FormTameTrackerFilter, FormWokrPlaceFilter,
                     FromChangeTimeTracker, SearchForm)
-from .models import Clients, Tasks, TimeTrack
+from .models import Clients, Comments, Tasks, TimeTrack
 from .pref import Pref
 from .utility import date_convert_from_string, date_end_of_day, log_exception
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
 @log_exception(None)
@@ -118,42 +120,132 @@ def task_list(request):
     context = {'tasks': page.object_list, 'form_search':form_search, 'page':page}
     return render(request, 'my_timer_main/main/task_list.html', context)
 
-@log_exception(None)
-@login_required
-def task_edit_or_add(request, task_id = ""):
-    task = None
-    if task_id:
-        task = get_object_or_404(Tasks, pk=task_id)
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        if task:
-            form = FormChangeTask(request.POST, instance=task)
-        else:
-            form = FormChangeTask(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            form.save(commit=True)
-            return HttpResponseRedirect(reverse('my_timer:task_list'))
+# @log_exception(None)
+# @login_required
+# def task_edit_or_add(request, task_id = "", comment_id= ""):
+#     task = None
+#     if task_id:
+#         task = get_object_or_404(Tasks, pk=task_id)
+#     if request.method == 'POST':
+#         # create a form instance and populate it with data from the request:
+#         if task:
+#             form = FormChangeTask(request.POST, instance=task)
+#         else:
+#             form = FormChangeTask(request.POST)
+#         # check whether it's valid:
+#         if form.is_valid():
+#             # process the data in form.cleaned_data as required
+#             # ...
+#             # redirect to a new URL:
+#             form.save(commit=True)
+#             return HttpResponseRedirect(reverse('my_timer:task_list'))
 
-    # if a GET (or any other method) we'll create a blank form
-    else:
-        if task:
-            form = FormChangeTask(initial={'user': request.user.pk, 'is_active':True}, instance=task)
-        else:
-            form = FormChangeTask(initial={'user': request.user.pk, 'is_active':True})
+#     # if a GET (or any other method) we'll create a blank form
+#     else:
+#         if task:
+#             form = FormChangeTask(initial={'user': request.user.pk, 'is_active':True}, instance=task)
+#         else:
+#             form = FormChangeTask(initial={'user': request.user.pk, 'is_active':True})
 
 
-    return render(request, 'my_timer_main/main/task_edit.html', {'form': form})
+#     return render(request, 'my_timer_main/main/task_edit.html', {'form': form})
 
-class TaskEdit(UpdateView):
+class TaskEdit(LoginRequiredMixin, ProcessFormView, TemplateResponseMixin):
     class_task = FormChangeTask
     class_comment = FormCommentEdit
-    
+    dic_of_form = {}
+    template_name = "my_timer_main/main/task_edit.html"
+    url_save_and_close = reverse_lazy('my_timer:task_list')
+    user = None
+    curr_task = None
+    curr_comment = None
+    curr_form = None
+    success_url = None
+    # def get_form_class(self):
+    #     pass
 
-class TaskNew(CreateView):
+    # def get_form_kwargs(self):
+    #     kwargs = super().get_form_kwargs()
+    #     if hasattr(self, 'object'):
+    #         kwargs.update({'instance': self.object})
+    #     kwargs.update({"initial":{'user': self.user.pk, 'is_active':True}})
+    #     return kwargs
+
+    # def get_success_url(self):
+    #     if 'save_and_close' in self.request.POST:
+    #         return self.url_save_and_close
+    #     else:
+    #         return reverse('my_timer:task_edit', kwargs={'task_id': self.object.id})
+    def collect_info_from_request(self, **kwargs):
+        self.curr_task = None
+        self.curr_comment = None
+        if kwargs.get("task_id", None) is not None:
+            self.curr_task = get_object_or_404(Tasks, pk=kwargs.get("task_id"))
+        if kwargs.get("comment_id", None) is not None:
+            self.curr_comment = get_object_or_404(Comments, pk=kwargs.get("comment_id"))
+
+
+    def inialize_form(self, **kwargs):
+        if self.curr_task is not None:
+            kwargs["instance"] = self.curr_task
+        self.dic_of_form["form_task_edit"] = self.class_task(**kwargs)
+        kwargs.pop("instance", None)
+        if self.curr_comment is not None:
+            kwargs["instance"] = self.curr_comment
+        self.dic_of_form["form_comment_edit"] = self.class_comment(**kwargs)
+
+    def post_collect_param(self):
+        if 'comment_save_and_close' in self.request.POST:
+            self.curr_form = self.dic_of_form["form_comment_edit"]
+            self.success_url = self.url_save_and_close
+        elif 'task_save_and_close' in self.request.POST:
+            self.curr_form = self.dic_of_form["form_task_edit"]
+            self.success_url = self.url_save_and_close
+        elif 'comment_save' in self.request.POST:
+            self.curr_form = self.dic_of_form["form_comment_edit"]
+            self.success_url = reverse('my_timer:task_edit', kwargs={'task_id': self.curr_task.id})
+        elif 'task_save' in self.request.POST:
+            self.curr_form = self.dic_of_form["form_task_edit"]
+            self.success_url = reverse('my_timer:task_edit', kwargs={'task_id': self.curr_task.id})
+    
+    def get_form(self):
+        return self.curr_form
+    
+    def get_context_data(self):
+        data = {'form_task_edit': self.dic_of_form["form_task_edit"],'form_comment_edit': self.dic_of_form["form_comment_edit"]}
+        # data = {'form_task_edit': FormChangeTask(initial={'user': 1, 'is_active':True}, instance=self.curr_task)}
+        comment_query = Comments.objects.filter(user=self.user, task=self.curr_task).order_by('-update_at').all()
+        data['not_has_comment_edit'] = self.curr_comment is None
+        data['array_of_comment'] = [{'content': comment.content, 
+                'edit': (self.curr_comment is not None and comment.id == self.curr_comment.id),
+                'update_at':comment.update_at,
+                'task_id': comment.task.id,
+                'comment_id': comment.id} for comment in comment_query]
+
+        return data
+
+    def post(self, request, *args, **kwargs):
+        self.user = request.user
+        self.collect_info_from_request(**kwargs)
+        self.inialize_form(data=self.request.POST)
+        self.post_collect_param()
+        return super().post(self, request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.save(commit=True)
+        return HttpResponseRedirect(self.success_url)
+
+    def form_invalid(self, form):
+        pass
+
+    def get(self, request, *args, **kwargs):
+        self.user = request.user
+        self.collect_info_from_request(**kwargs)
+        self.inialize_form(initial={'user': request.user.pk, 'is_active':True, 'task':self.curr_task})
+        return super().get(self, request, *args, **kwargs)
+
+
+class TaskNew(LoginRequiredMixin, CreateView):
     template_name = "my_timer_main/main/task_add.html"
     url_save_and_close = reverse_lazy('my_timer:task_list')
     model = Task

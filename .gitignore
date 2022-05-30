@@ -11,3 +11,4 @@ bboard.data
 **.sqlite3
 **.log*
 my_timer_project/my_timer/.env.prod
+**/media/**

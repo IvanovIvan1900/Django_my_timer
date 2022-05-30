@@ -115,5 +115,5 @@ class FormCommentEdit(forms.ModelForm):
     class Meta:
         model = Comments
         fields = ['task', 'content',  'user']
-        labels = {'task': 'Задача', 'content':'Содержание'}
-        widgets = {'user': forms.HiddenInput, 'task': forms.HiddenInput, 'content':CKEditorUploadingWidget(), 'created_at':forms.HiddenInput}
+        labels = {'task': 'Задача', 'content':''}
+        widgets = {'user': forms.HiddenInput, 'task': forms.HiddenInput, 'content':CKEditorUploadingWidget(), 'update_at':forms.HiddenInput}

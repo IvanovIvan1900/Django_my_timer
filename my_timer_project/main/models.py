@@ -91,11 +91,11 @@ class TimeTrack(models.Model):
 class Comments(models.Model):
     task = models.ForeignKey(Tasks, on_delete=models.CASCADE, verbose_name="Задача")
     content = RichTextUploadingField(verbose_name='Содержание')
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True,
+    update_at = models.DateTimeField(auto_now=True, db_index=True,
             verbose_name='Дата создания')
     user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.PROTECT, db_index = True)
     class Meta:
         verbose_name_plural = 'Комментарии'
         verbose_name = 'Комментарий'
-        ordering = ['created_at']
+        ordering = ['update_at']
 # signals.post_init.connect(receiver=TimeTracker_post_init, sender=TimeTrack)

@@ -61,7 +61,8 @@
                                         </td>
                                         <td>{{ time_tracker.date_start|date:'d-m  H:i' }}</td>
                                         <td id='date_start_id_{{ time_tracker.id }}'>
-                                            <input type="hidden" value='{{ time_tracker.date_start|date:"Y-m-d_H:i:s" }}'>
+                                            <input type="hidden"
+                                                   value='{{ time_tracker.date_start|date:"Y-m-d_H:i:s" }}'>
                                             {{ time_tracker.duration_sec|sec_to_hh_mm }}
                                         </td>
                                         <td>

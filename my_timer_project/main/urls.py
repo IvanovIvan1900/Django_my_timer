@@ -7,9 +7,9 @@ from django.views.decorators.cache import never_cache
 
 # from .views import cleint_filter
 from . import views
-from .views import (TaskNew, action_wich_tasks, client_delete,
+from .views import (TaskEdit, TaskNew, action_wich_tasks, client_delete,
                     client_edit_or_add, client_list, report_task_list,
-                    task_delete, task_edit_or_add, task_list,
+                    task_delete,  task_list,
                     time_track_delete, time_track_edit_or_add, time_track_list,
                     work_place)
 
@@ -23,7 +23,8 @@ urlpatterns = [
     path('client_delete/<int:client_id>/', client_delete, name = 'client_delete'),
     path('client_add/', client_edit_or_add, name = 'client_add'),
     path('client_list/', client_list, name = 'client_list'),
-    path('task_edit/<int:task_id>/', task_edit_or_add, name = 'task_edit'),
+    path('task_edit/<int:task_id>/<int:comment_id>', TaskEdit.as_view(), name = 'task_edit'),
+    path('task_edit/<int:task_id>/', TaskEdit.as_view(), name = 'task_edit'),
     path('task_delete/<int:task_id>/', task_delete, name = 'task_delete'),
     path('task_add/', TaskNew.as_view(), name = 'task_add'),
     path('task_list/', task_list, name = 'task_list'),
@@ -42,10 +43,12 @@ urlpatterns = [
     path('accounts/logout/', LogoutView.as_view(next_page='my_timer:login'), name='logout'),
     path('accounts/password/change/', PasswordChangeView.as_view(template_name='registration/change_password.html'),
         name='password_change'),
+    
     # path('test_report/', test_report),
 
 ]
 
 if settings.DEBUG:
     urlpatterns.append(path('static/<path:path>', never_cache(serve)))
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
