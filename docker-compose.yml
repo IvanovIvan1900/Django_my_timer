@@ -63,7 +63,7 @@ services:
 
   my_timer_prod:
     container_name: my_timer_prod
-    image: my_timer_prod:1.01
+    image: my_timer_prod:1.02
     build:
       context: ./my_timer_project
       dockerfile: Dockerfile

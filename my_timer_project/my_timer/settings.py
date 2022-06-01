@@ -108,12 +108,16 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'builtins': [                                     # Add this section
-                "debugtools.templatetags.debugtools_tags",   # Add this line
-            ],
+            # 'builtins': [                                     # Add this section
+            #     # "debugtools.templatetags.debugtools_tags",   # Add this line
+            # ],
         },
     },
 ]
+
+if DEBUG:
+    array_builtins = TEMPLATES[0]["OPTIONS"].setdefault("builtins", [])
+    array_builtins.append(["debugtools.templatetags.debugtools_tags"])
 
 WSGI_APPLICATION = 'my_timer.wsgi.application'
 
