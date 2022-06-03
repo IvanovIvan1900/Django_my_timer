@@ -26,6 +26,13 @@ volumes:
       device: /home/dav/WorkMyProject/my_timer_bd/statics/
       o: bind
 
+  my_timer_media:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/dav/WorkMyProject/my_timer_bd/media/
+      o: bind
+
   # static_volume:
   
 services:
@@ -73,6 +80,7 @@ services:
     volumes:
       - my_timer_logs:/home/app/web/logs
       - my_timer_statics:/home/app/web/staticfiles
+      - my_timer_media:/home/app/web/mediafiles
     expose:
       - 8000
     networks:
@@ -94,7 +102,8 @@ services:
     ports:
       - 1337:80
     volumes:
-          - my_timer_statics:/home/app/web/staticfiles
+      - my_timer_statics:/home/app/web/staticfiles
+      - my_timer_media:/home/app/web/mediafiles
     networks:
       - my_timer_work
     restart: unless-stopped

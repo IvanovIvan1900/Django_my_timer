@@ -25,3 +25,5 @@
 **/values.dev.yaml
 **/*.log*
 README.md
+pytest.ini
+**/tests/**

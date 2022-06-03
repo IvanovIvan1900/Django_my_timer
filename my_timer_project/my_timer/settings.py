@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import environ
 import os
-
+# from ckeditor_uploader.backends import PillowBackend
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
@@ -117,7 +117,7 @@ TEMPLATES = [
 
 if DEBUG:
     array_builtins = TEMPLATES[0]["OPTIONS"].setdefault("builtins", [])
-    array_builtins.append(["debugtools.templatetags.debugtools_tags"])
+    array_builtins.append("debugtools.templatetags.debugtools_tags")
 
 WSGI_APPLICATION = 'my_timer.wsgi.application'
 
@@ -193,21 +193,20 @@ if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR,'main/static/')
 else:
     STATIC_ROOT = BASE_DIR / "staticfiles"
+
 MEDIA_URL  = 'media/'
-MEDIA_ROOT =  os.path.join(BASE_DIR,'main/media/')
-# CKEDITOR_UPLOAD_PATH = os.path.join(BASE_DIR,"uploads/")
-CKEDITOR_UPLOAD_PATH = "uploads/"
+if DEBUG:
+    MEDIA_ROOT =  os.path.join(BASE_DIR,'main/media/')
+else:
+    MEDIA_ROOT =  os.path.join(BASE_DIR,"mediafiles") 
 TEMPUS_DOMINUS_LOCALIZE = True
 TEMPUS_DOMINUS_INCLUDE_ASSETS = True
 LOGIN_REDIRECT_URL = 'my_timer:work_place'
 SESSION_COOKIE_AGE = 259200# 3 дня
-# CKEDITOR_CONFIGS = {
-# 'default': {
-#         'toolbar': 'full',
-#         'height': '100%',
-#         'width': '100%',
-#     },
-#     }
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_RESTRICT_BY_USER = True
+CKEDITOR_IMAGE_BACKEND="pillow"
 CKEDITOR_CONFIGS = {
     'default': {
         # 'skin': 'moono',
@@ -272,8 +271,6 @@ CKEDITOR_CONFIGS = {
         # ]),
     }
 }
-CKEDITOR_RESTRICT_BY_USER = True
-CKEDITOR_IMAGE_BACKEND="pillow"
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
