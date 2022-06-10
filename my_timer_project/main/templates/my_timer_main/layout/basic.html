@@ -7,13 +7,24 @@
         <meta name="viewport"
               content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>
-            {% block title %}Главная{% endblock %}
+            {% block title %}
+                Главная
+            {% endblock title %}
         -Тайм трекер</title>
         {% bootstrap_css %}
-        <link rel="shortcut icon" type="image/png" href="{% static 'main/favicon.ico' %}"/>
+        {% if has_active_task %}
+            <link rel="shortcut icon"
+                  type="image/png"
+                  href="{% static 'main/favicon_run.ico' %}"/>
+        {% else %}
+            <link rel="shortcut icon"
+                  type="image/png"
+                  href="{% static 'main/favicon.ico' %}"/>
+        {% endif %}
         <!-- <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}"> -->
         {% bootstrap_javascript jquery='slim' %}
-        {% block head %}{% endblock %}
+        {% block head %}
+        {% endblock head %}
     </head>
     <body class="container-fluid">
         <header class="mb-4">

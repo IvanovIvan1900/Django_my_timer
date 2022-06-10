@@ -78,4 +78,17 @@ def date_convert_from_string(str_value, date_format = None):
 def date_end_of_day(dt_in):
     return dt_in.replace(hour=23, minute=59, second=59, microsecond=999) if isinstance(dt_in, dt) else None
 
+@log_exception(None)
+def count_active_task_add():
+    name_cache = "cunt_active_task"
+    caches['mem_cache'].set(name_cache, caches['mem_cache'].get(name_cache)+1)
+
+@log_exception(None)
+def count_active_task_minus():
+    name_cache = "cunt_active_task"
+    curr_count = caches['mem_cache'].get(name_cache)
+    if curr_count == 0:
+        logger.error('Function "count_active_task_minus", but in cache is 0')
+    caches['mem_cache'].set(name_cache, curr_count-1)
+
 #def log_exception(name_log:str = None):

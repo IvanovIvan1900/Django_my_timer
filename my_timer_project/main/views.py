@@ -20,12 +20,13 @@ from django.views import View
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import CreateView, ProcessFormView, UpdateView
 
+
 from .forms import (FormChangeClient, FormChangeTask, FormCommentEdit,
                     FormNewTask, FormTameTrackerFilter, FormWokrPlaceFilter,
                     FromChangeTimeTracker, SearchForm)
 from .models import Clients, Comments, Tasks, TimeTrack
 from .pref import Pref
-from .utility import date_convert_from_string, date_end_of_day, log_exception
+from .utility import count_active_task_add, count_active_task_minus, date_convert_from_string, date_end_of_day, log_exception
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
@@ -449,6 +450,13 @@ def work_place(request):
             'form_new_task':form_new_task, 'form_search': form_search, "list_last_time_track":list_last_time_track,}
     return render(request, 'my_timer_main/main/work_place.html', context)
 
+
+# def get_five_ico(request):
+#     result = finders.find('main/favicon.ico')
+#     searched_locations = finders.searched_locations
+#     image_data = open(searched_locations, "rb").read()
+#     return HttpResponse(image_data, mimetype="image/png")   
+
 @log_exception(None)
 @login_required
 def action_wich_tasks(request, action, id):
@@ -463,10 +471,12 @@ def action_wich_tasks(request, action, id):
         task = get_object_or_404(Tasks, pk=id)
         new_tm = TimeTrack(task = task, date_start = tz.now(), user = request.user, duration_sec = 0)
         new_tm.save()
+        count_active_task_add()
     elif action == "stop":
         time_track = get_object_or_404(TimeTrack, pk=id)
         time_track.date_stop = tz.now()
         time_track.save()
+        count_active_task_minus()
     elif action == "task_done":
         task = get_object_or_404(Tasks, pk=id)
         task.is_active = False
@@ -579,11 +589,3 @@ def time_track_delete(request, time_track_id):
     TimeTrack.objects.filter(id=time_track_id).delete()
     return HttpResponseRedirect(reverse('my_timer:time_track_list'))
 
-# @login_required
-# def test_report(request):
-#     context= {"total_spend":100, "client_full_name":"Test", "date_start":datetime.datetime.now(),
-#         "date_stop":datetime.datetime.now()}
-#     array_of_task = [{"task_name": "Test 1", "spend_time": 15, "index": 1}, {"task_name": "Test 2", "spend_time": 250, "index": 2}]
-
-#     context["array_time_spend"] = array_of_task
-#     return render(request, 'my_timer_main/main/report.html', context)

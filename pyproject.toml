@@ -28,6 +28,7 @@ pytest-xdist = "^2.5.0"
 pytest-lazy-fixture = "^0.6.3"
 django-debugtools = "^2.0"
 django-debug-toolbar = "^3.2.4"
+djlint = "^1.1.1"
 
 
 [tool.commitizen]

@@ -43,7 +43,7 @@ urlpatterns = [
     path('accounts/logout/', LogoutView.as_view(next_page='my_timer:login'), name='logout'),
     path('accounts/password/change/', PasswordChangeView.as_view(template_name='registration/change_password.html'),
         name='password_change'),
-    
+    # re_path(r'^favicon\.ico$', get_five_ico, name='favicon'),    
     # path('test_report/', test_report),
 
 ]

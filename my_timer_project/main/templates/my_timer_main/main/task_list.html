@@ -2,63 +2,94 @@
 {% load bootstrap4 %}
 {% block title %}Задачи{% endblock %}
 {% load static %}
-{%block menu_block%}
-<nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
-  <a class="navbar-brand" href="{% url 'my_timer:task_add' %}">Добавить задачу</a>
-    <div class="row">
-    <form class="col-md-auto form-inline">
-    {% bootstrap_form form_search show_label=False %}
-    {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
-    {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
-    </form>
-    </div>
-</nav>
+{% block menu_block %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light justify-content-end">
+        <a class="navbar-brand" href="{% url 'my_timer:task_add' %}">Добавить задачу</a>
+        <div class="row">
+            <form class="col-md-auto form-inline">
+                {% bootstrap_form form_search show_label=False %}
+                {% bootstrap_button  button_class="btn btn-outline-dark" content='X' button_type='submit' name="search_button" value="clear_search" %}
+                {% bootstrap_button  button_class="btn btn-outline-success" content='Искать' button_type='submit' name="search_button" value="search" %}
+            </form>
+        </div>
+    </nav>
 {% endblock %}
 {% block content %}
-<div class="row">
-</div>
-<div class="row">
-    <table class="table table-hover table table-striped table-hover">
-        <thead>
-            <tr>
-              <th scope="col" style="width: 5%;">Активная</th>
-              <th scope="col" style="width: 35%;">Имя задачи</th>
-              <th scope="col" style="width: 50%;">Имя клиента</th>
-              <th scope="col" style="width: 50%;">Дата начала (план)</th>
-              <th scope="col" style="width: 5%;">Удалить</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if tasks %}
-            {% for task in tasks %}
-            <tr>
-              {% if task.is_active %}
-                <td align="center"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1" checked disabled></td>
-              {% else %}
-                <td align="center"><input class="form-check-input" type="checkbox" value="" id="defaultCheck2" disabled></td>
-            {% endif%}
-              <td><a href="{% url 'my_timer:task_edit' task_id=task.pk %}">{{ task.name }}</td>
-              <td><a href="{% url 'my_timer:client_edit' client_id=task.client.pk %}">{{ task.client.name}}</td>
-                <td>{{ task.date_start_plan|date:"d.m.Y" }}</td>
-                  <td><a href="{% url 'my_timer:task_delete' task_id=task.pk %}"><img src="{% static 'main/ico_deactive.png' %}"
-                    width="18" height="18" alt="Удалить"></td>
-              </tr>
-            {% endfor %}
-            {% endif %}
-          </tbody>
-    </table>
-</div>
-<div class="row d-flex justify-content-center">
-  {% if page.has_previous %}
-  <a href="?page={{ page.previous_page_number }}">&lt;</a>
-  &nbsp;&nbsp;|&nbsp;&nbsp;
-  {% endif %}
-  Часть No{{ page.number }} из {{ page.paginator.num_pages }}
-  {% if page.has_next %}
-  &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="?page={{ page.next_page_number }}">&gt;</a>
-  {% endif %}
-</div>
-
-
-{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'main/style.css' %}">
+    <div class="row"></div>
+    <div class="row">
+        <table class="table table-hover table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 5%;">Активная</th>
+                    <th scope="col" style="width: 35%;">Имя задачи</th>
+                    <th scope="col" style="width: 50%;">Имя клиента</th>
+                    <th scope="col" style="width: 50%;">Дата начала (план)</th>
+                    <th scope="col" style="width: 5%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if tasks %}
+                    {% for task in tasks %}
+                        <tr>
+                            {% if task.is_active %}
+                                <td align="center">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="defaultCheck1"
+                                           checked
+                                           disabled>
+                                </td>
+                            {% else %}
+                                <td align="center">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           value=""
+                                           id="defaultCheck2"
+                                           disabled>
+                                </td>
+                            {% endif %}
+                            <td>
+                                <a href="{% url 'my_timer:task_edit' task_id=task.pk %}">{{ task.name }}
+                                </td>
+                                <td>
+                                    <a href="{% url 'my_timer:client_edit' client_id=task.client.pk %}">{{ task.client.name }}
+                                    </td>
+                                    <td>{{ task.date_start_plan|date:"d.m.Y" }}</td>
+                                    <td>
+                                        <div class="container text-center button_container">
+                                            <a href="{% url 'my_timer:action_wich_tasks' action='start' id=task.pk %}"
+                                               class="btn btn-outline-success btn-circle"
+                                               role="button">
+                                                <img src="{% static 'main/ico_play.png' %}"
+                                                     class="ico-button"
+                                                     alt="Запуск задачи">
+                                            </a>
+                                            <a href="{% url 'my_timer:task_delete' task_id=task.pk %}"
+                                               class="btn btn-outline-success btn-circle"
+                                               role="button">
+                                                <img src="{% static 'main/ico_deactive.png' %}"
+                                                     class="ico-button"
+                                                     alt="Удалить задачу">
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="row d-flex justify-content-center">
+                {% if page.has_previous %}
+                    <a href="?page={{ page.previous_page_number }}">&lt;</a>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                {% endif %}
+                Часть No{{ page.number }} из {{ page.paginator.num_pages }}
+                {% if page.has_next %}
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <a href="?page={{ page.next_page_number }}">&gt;</a>
+                {% endif %}
+            </div>
+        {% endblock %}

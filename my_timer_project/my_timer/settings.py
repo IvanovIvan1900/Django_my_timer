@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 import environ
 import os
-# from ckeditor_uploader.backends import PillowBackend
+
+
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
@@ -83,7 +84,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # 'main.middlewares.FavIconMiddleware',
 ]
+
 
 if DEBUG:
     INSTALLED_APPS.extend([
@@ -107,6 +110,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'main.middlewares.FavIcon',
             ],
             # 'builtins': [                                     # Add this section
             #     # "debugtools.templatetags.debugtools_tags",   # Add this line
@@ -207,6 +211,7 @@ SESSION_COOKIE_AGE = 259200# 3 дня
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_RESTRICT_BY_USER = True
 CKEDITOR_IMAGE_BACKEND="pillow"
+CKEDITOR_ALLOW_NONIMAGE_FILES = True
 CKEDITOR_CONFIGS = {
     'default': {
         # 'skin': 'moono',
@@ -253,8 +258,9 @@ CKEDITOR_CONFIGS = {
         'toolbarCanCollapse': True,
         # 'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
         'tabSpaces': 4,
-        # 'extraPlugins': ','.join([
-        #     'uploadimage', # the upload image feature
+        'extraPlugins': ','.join([
+            'uploadfile', # the upload image feature
+        ])
         #     # your extra plugins here
         #     'div',
         #     'autolink',
