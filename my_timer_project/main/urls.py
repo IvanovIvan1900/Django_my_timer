@@ -8,7 +8,7 @@ from django.views.decorators.cache import never_cache
 # from .views import cleint_filter
 from . import views
 from .views import (TaskEdit, TaskNew, action_wich_tasks, client_delete,
-                    client_edit_or_add, client_list, report_task_list,
+                    client_edit_or_add, client_list, comment_delete, report_task_list,
                     task_delete,  task_list,
                     time_track_delete, time_track_edit_or_add, time_track_list,
                     work_place)
@@ -24,6 +24,7 @@ urlpatterns = [
     path('client_add/', client_edit_or_add, name = 'client_add'),
     path('client_list/', client_list, name = 'client_list'),
     path('task_edit/<int:task_id>/<int:comment_id>', TaskEdit.as_view(), name = 'task_edit'),
+    path('comments_delete/<int:task_id>/<int:comment_id>', comment_delete, name = 'comment_delete'),
     path('task_edit/<int:task_id>/', TaskEdit.as_view(), name = 'task_edit'),
     path('task_delete/<int:task_id>/', task_delete, name = 'task_delete'),
     path('task_add/', TaskNew.as_view(), name = 'task_add'),

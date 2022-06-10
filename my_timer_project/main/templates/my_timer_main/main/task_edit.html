@@ -39,8 +39,8 @@
         {% if array_of_comment %}
             <div class="row d-flex justify-content-center">
                 {% comment %} <div class="col-md-8 col-lg-6"> {% endcomment %}
-                    <div class="col">
-                        <div class="card shadow-0 border" style="background-color: #f0f2f5;">
+                <div class="col">
+                    <div class="card shadow-0 border" style="background-color: #f0f2f5;">
                         <div class="card-body p-4">
                             {% for comment in array_of_comment %}
                                 {% if comment.edit %}
@@ -67,12 +67,15 @@
                                             {{ comment.content|safe }}
                                             <div class="d-flex justify-content-between">
                                                 <div class="d-flex flex-row align-items-center">
-                                                    <p class="small mb-0 ms-2">
-                                                        Изменено:&nbsp;{{ comment.update_at|date:"d-m-Y  H:i:s" }}
-                                                    </p>
+                                                    <p class="small mb-0 ms-2">Изменено:&nbsp;{{ comment.update_at|date:"d-m-Y  H:i:s" }}</p>
                                                 </div>
-                                                <div class="d-flex flex-row align-items-center">
-                                                    <a href="{% url 'my_timer:task_edit' task_id=comment.task_id comment_id=comment.comment_id %}"> Изменить </a>
+                                                <div>
+                                                    <div class="d-flex flex-row align-items-center">
+                                                        <a href="{% url 'my_timer:task_edit' task_id=comment.task_id comment_id=comment.comment_id %}">Изменить</a>
+                                                    </div>
+                                                    <div class="d-flex flex-row align-items-center">
+                                                        <a href="{% url 'my_timer:comment_delete' task_id=comment.task_id comment_id=comment.comment_id %}">Удалить</a>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -85,28 +88,28 @@
             </div>
         {% endif %}
         {% if not_has_comment_edit %}
-        <div class="row d-flex justify-content-center">
-            <div class="col">
-            <form method="post">
-                Добавить новый комментарий
-                {% csrf_token %}
-                {% bootstrap_form form_comment_edit  %}
-                {{ form_comment_edit.media }}
-                <div class="d-flex justify-content-center">
-                    <div class="btn-toolbar" role="toolbar">
-                        <div class="btn-group mr-2" role="group" aria-label="First group">
-                            <button class="btn btn-primary btn-space"
-                                    name="comment_save_and_close"
-                                    type="submit">Сохранить и закрыть</button>
+            <div class="row d-flex justify-content-center">
+                <div class="col">
+                    <form method="post">
+                        Добавить новый комментарий
+                        {% csrf_token %}
+                        {% bootstrap_form form_comment_edit  %}
+                        {{ form_comment_edit.media }}
+                        <div class="d-flex justify-content-center">
+                            <div class="btn-toolbar" role="toolbar">
+                                <div class="btn-group mr-2" role="group" aria-label="First group">
+                                    <button class="btn btn-primary btn-space"
+                                            name="comment_save_and_close"
+                                            type="submit">Сохранить и закрыть</button>
+                                </div>
+                                <div class="btn-group mr-2" role="group" aria-label="First group">
+                                    <button class="btn btn-primary btn-space" name="comment_save" type="submit">Сохранить</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="btn-group mr-2" role="group" aria-label="First group">
-                            <button class="btn btn-primary btn-space" name="comment_save" type="submit">Сохранить</button>
-                        </div>
-                    </div>
+                    </form>
                 </div>
-            </form>
-        </div>
-        </div>
+            </div>
         {% endif %}
     </div>
 {% endblock content %}

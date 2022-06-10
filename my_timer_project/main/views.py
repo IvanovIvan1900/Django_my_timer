@@ -82,7 +82,7 @@ def client_edit_or_add(request, client_id = ""):
         if client:
             form = FormChangeClient(initial={'user': request.user.pk}, instance=client)
         else:
-            form = FormChangeClient(initial={'user': request.user.pk})
+            form = FormChangeClient(initial={'user': request.user.pk, 'is_active':True})
 
 
     return render(request, 'my_timer_main/main/client_edit.html', {'form': form})
@@ -278,8 +278,11 @@ class TaskNew(LoginRequiredMixin, CreateView):
 @log_exception(None)
 @login_required
 def task_delete(request, task_id):
+    # try:
     task = get_object_or_404(Tasks, pk=task_id)
     task.delete()
+    # except:
+    #     pass
     return HttpResponseRedirect(reverse('my_timer:task_list'))
 
 @log_exception(None)
@@ -586,6 +589,16 @@ def time_track_edit_or_add(request, time_track_id = ""):
 @log_exception(None)
 @login_required
 def time_track_delete(request, time_track_id):
-    TimeTrack.objects.filter(id=time_track_id).delete()
+    # TimeTrack.objects.filter(id=time_track_id).delete()
+    TimeTrackObject = get_object_or_404(TimeTrack, pk=time_track_id)
+    TimeTrackObject.delete()
     return HttpResponseRedirect(reverse('my_timer:time_track_list'))
+
+@log_exception(None)
+@login_required
+def comment_delete(request, task_id, comment_id):
+    # TimeTrack.objects.filter(id=time_track_id).delete()
+    CommentObject = get_object_or_404(Comments, pk=comment_id)
+    CommentObject.delete()
+    return HttpResponseRedirect(reverse('my_timer:task_edit', kwargs={'task_id': task_id}))
 
