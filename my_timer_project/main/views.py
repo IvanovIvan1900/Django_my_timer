@@ -318,25 +318,25 @@ def work_place(request):
         """
         # task_name = "test"
         # clien_filter_id = 1
-        query_task = Tasks.objects.filter(user=user).filter(is_active=True)
+        query_task = Tasks.objects.filter(user=user).filter(is_active=True).filter(is_delete=False)
         if task_name:
             query_task = query_task.filter(name__icontains=task_name)
         if clien_filter_id:
             query_task = query_task.filter(client__id=clien_filter_id)
         query_task = query_task.values("pk")
 
-        time_track_query = TimeTrack.objects.filter(task__id__in=query_task).values("task__id").order_by().annotate(date_max=Max("date_stop"),
+        time_track_query = TimeTrack.objects.filter(task__id__in=query_task).filter(is_delete=False).values("task__id").order_by().annotate(date_max=Max("date_stop"),
                 duration=Sum("duration_sec"),is_plan=Value(0)).values("task_id", "date_max", "duration", "is_plan")
         
-        time_track_id_exist = TimeTrack.objects.values("task__id").distinct()
+        time_track_id_exist = TimeTrack.objects.filter(is_delete=False).values("task__id").distinct()
 
-        qery_task_plan = Tasks.objects.filter(is_active=True,user=user, date_start_plan__lte=date_now, id__in=query_task).exclude(id__in=time_track_id_exist).annotate(task_id=F('id'), 
+        qery_task_plan = Tasks.objects.filter(is_active=True,user=user, date_start_plan__lte=date_now, id__in=query_task).exclude(id__in=time_track_id_exist).filter(is_delete=False).annotate(task_id=F('id'), 
                 date_max=F('date_start_plan'), duration=Value(0), is_plan=Value(1)).values("task_id", "date_max", "duration", "is_plan")
         
         union_query = time_track_query.union(qery_task_plan).order_by("-is_plan", "-date_max")[:count_last_tasks]
         # т.к. join не поддерживается django orm, будем просто получать доп данные, вторым запросом.
         list_of_id = [elem.get("task_id") for elem in union_query]
-        addition_info = Tasks.objects.filter(id__in=list_of_id).select_related("client").all()
+        addition_info = Tasks.objects.filter(id__in=list_of_id).filter(is_delete=False).select_related("client").all()
         dic_addit_info = {}
         for elem in addition_info:
             dic_addit_info[elem.id] = elem
