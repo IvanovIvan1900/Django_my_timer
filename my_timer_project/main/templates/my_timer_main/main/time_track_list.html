@@ -93,8 +93,8 @@
                                         <a href="{% url 'my_timer:client_edit' client_id=time_track.task.client.pk %}">{{ time_track.task.client.name }}
                                         </td>
                                         <td>{{ time_track.date_account|date:'d-m' }}</td>
-                                        <td>{{ time_track.date_start|date:'d-m  H:i' }}</td>
-                                        <td>{{ time_track.date_stop|date:'d-m  H:i' }}</td>
+                                        <td id="td_date_start">{{ time_track.date_start|date:'d-m  H:i' }}</td>
+                                        <td id="td_date_stop">{{ time_track.date_stop|date:'d-m  H:i' }}</td>
                                         <td id='duration_id_{{ time_track.task.pk }}'
                                             data-tt_id='{{ time_track.pk }}'
                                             data-date_start='{{ time_track.date_start|date:"Y-m-d_H:i:s" }}'

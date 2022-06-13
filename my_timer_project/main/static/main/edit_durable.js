@@ -59,22 +59,42 @@ function add_element_to_edit(td) {
     new_info_map.set('time_stop', div_edit.querySelector('input[id="time_stop"]'));
     new_info_map.set('time_duration', div_edit.querySelector('input[id="time_duration"]'));
     new_info_map.set('href_time_duration', td.querySelector('a[id="a_time_duration"]'));
+    new_info_map.set('td_date_start', td.parentNode.querySelector('td[id="td_date_start"]'));
+    new_info_map.set('td_date_stop', td.parentNode.querySelector('td[id="td_date_stop"]'));
 
     new_info_map.get('time_start').onblur = change_part_of_time;
     new_info_map.get('time_stop').onblur = change_part_of_time;
     new_info_map.get('time_duration').onblur = change_part_of_time;
-
     new_info_map.get('href_time_duration').innerText = "";
     info_from_page.set('curr_string_info', new_info_map);
 
     refresh_data_in_input();
 }
 
-function close_element_to_edit() {
+function service_date_format_to_represent(d) {
+    // ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
+    // d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    return ("0" + d.getDate()).slice(-2) + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+}
+
+function service_dat_format_to_inner(d) {
+    return d.getFullYear() +
+        "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2) + "_" + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2);
+}
+
+function close_element_to_edit(update_html) {
     let info_map = info_from_page.get('curr_string_info');
     info_map.get('href_time_duration').innerText = seconds_to_hh_mm(info_map.get('duration'));
     info_map.get('div_edit').innerHTML = "";
     info_from_page.set('curr_string_info', undefined);
+    if (update_html) {
+        info_map.get('td_date_start').innerText = service_date_format_to_represent(info_map.get("date_start"));
+        info_map.get('td_date_stop').innerText = service_date_format_to_represent(info_map.get("date_stop"));
+        td = info_map.get("root_td");
+        td.dataset.date_start = service_dat_format_to_inner(info_map.get("date_start"));
+        td.dataset.date_stop = service_dat_format_to_inner(info_map.get("date_stop"));
+        td.dataset.duration = info_map.get('duration');
+    }
 }
 
 function change_part_of_time(event) {
@@ -116,10 +136,12 @@ function refresh_data_in_input() {
 
 function click_to_button(event) {
     let id = event.id;
+    update_html = false
     if (id == "accept") {
         update_info_in_bd();
+        update_html = true
     }
-    close_element_to_edit();
+    close_element_to_edit(update_html);
 }
 
 function toIsoString(date) {
