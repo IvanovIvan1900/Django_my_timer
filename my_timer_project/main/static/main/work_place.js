@@ -15,6 +15,7 @@ function get_info_form_page() {
             if (updatable_list.length > 0) {
                 // a = 4;
                 let timerId = setInterval(update_duration, 60 * 1000);
+                update_duration();
             }
         }
     }
