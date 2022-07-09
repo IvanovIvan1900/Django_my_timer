@@ -2,11 +2,18 @@
 # import os
 # from io import BytesIO
 
+from typing import Optional
+import urllib
+from urllib import response
+
 import pdfkit
 from django.conf import settings
 # from django.contrib.staticfiles import finders
 from django.http import HttpResponse
 from django.template.loader import get_template
+from django.urls import reverse
+
+
 # from xhtml2pdf import pisa
 
 # defining the function to convert an HTML file to a PDF file
@@ -71,7 +78,7 @@ from django.template.loader import get_template
 #         return HttpResponse(result.getvalue(), content_type='application/pdf')
 #     return None
 
-def html_to_pdf(template_src, context_dict = None):
+def html_to_pdf(template_src:str, context_dict:Optional[dict] = None)->response:
     if context_dict is None:
         context_dict = {}
     template = get_template(template_src)
@@ -85,3 +92,7 @@ def html_to_pdf(template_src, context_dict = None):
     # os.remove("out.pdf")  # remove the locally created pdf file.
     # return response
 
+def build_url(url_str:str, param_dic:dict)->str:
+    full_param = {param_key:param_value for param_key, param_value in param_dic.items() if param_value}
+    return  f'{reverse(url_str)}?{urllib.parse.urlencode(full_param)}'
+    

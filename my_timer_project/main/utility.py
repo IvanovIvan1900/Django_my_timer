@@ -8,6 +8,7 @@ from django.utils.timezone import get_current_timezone, make_aware
 
 import sys
 
+
 logger = logging.getLogger(f'django.{__name__}')
 # logger.error('test logger')
 
@@ -81,14 +82,31 @@ def date_end_of_day(dt_in):
 @log_exception(None)
 def count_active_task_add():
     name_cache = "cunt_active_task"
+    active_task_init()
     caches['mem_cache'].set(name_cache, caches['mem_cache'].get(name_cache)+1)
 
 @log_exception(None)
 def count_active_task_minus():
     name_cache = "cunt_active_task"
+    active_task_init()
     curr_count = caches['mem_cache'].get(name_cache)
     if curr_count == 0:
         logger.error('Function "count_active_task_minus", but in cache is 0')
     caches['mem_cache'].set(name_cache, curr_count-1)
+
+@log_exception(None)
+def active_task_init():
+    from main.models import TimeTrack
+    cache_name = "cunt_active_task"
+    cache = caches['mem_cache']
+
+    count_active_task = cache.get(cache_name, None)
+    if count_active_task is None:
+        count_active_task = TimeTrack.objects.filter(is_active = True).count()
+        cache.set(cache_name, count_active_task)
+        logger = logging.getLogger(f'django.{__name__}.debug.init_cache')
+        logger.warning("init cache active task")
+
+
 
 #def log_exception(name_log:str = None):

@@ -1,5 +1,5 @@
 import collections
-from datetime import datetime
+from datetime import datetime, time
 import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -20,6 +20,8 @@ def test_auth_view(auto_login_user):
 #    assert True
 
 class TestWorkPlaceView:
+   def service_get_begin_date(self, date_inptu:datetime)->datetime:
+          return datetime.combine(date_inptu.date(), time(0,0,0), date_inptu.tzinfo)
 
    def service_get_last_task(self, count_last_tasks:int,list_of_time_tracker:list[TimeTrack], dic_of_task:dict, curr_user:User,
           clien_filter_id:int=None, task_name:str=None)->list[dict]:
@@ -37,10 +39,12 @@ class TestWorkPlaceView:
             # is_plan - это задача с датой начала
             # is_outdate - это задача уже просрочена
 
-      array_track = [elem for elem in list_of_time_tracker if elem.user == curr_user and 
-                     elem.task.is_active and 
+      array_track = [elem for elem in list_of_time_tracker if elem.user == curr_user and
+                     elem.task.is_active and
                      (clien_filter_id is None or elem.task.client.id == clien_filter_id) and elem.task.client.is_active
-                     and (task_name is None or task_name in elem.task.name)]
+                     and (task_name is None or task_name in elem.task.name) 
+                     and not elem.is_delete
+                     ]
       dic_of_timet_track:dict = {}
       set_of_plan_task_wich_time_track =set()
       for elem in array_track:
@@ -48,13 +52,15 @@ class TestWorkPlaceView:
          elem_data["task"] = elem.task
          elem_data["duration"] = elem_data.get("duration", 0) + elem.duration_sec
          elem_data["max_date"] = elem.date_stop if elem_data.get("max_date", None) is None else  max(elem_data.get("max_date", None), elem.date_stop)
+         elem_data["duration_after_plan"] = elem_data.get("duration_after_plan", 0) + 0 if (elem.task.date_start_plan is None or elem.date_stop < elem.task.date_start_plan) else elem.duration_sec
          dic_of_timet_track[elem.task.id] = elem_data
          set_of_plan_task_wich_time_track.add(elem.task)
       temp_list_track = []
       for key, value in dic_of_timet_track.items():
          temp_list_track.append({"task_id":value["task"].id, "max_date":value["max_date"], "task_name":value["task"].name, "task_is_acitve":value["task"].is_active, 
                "client_name":value["task"].client.name, "client_id":value["task"].client.id, "task_duration":int(value["duration"]),
-               "diff_day":((my_now-value["max_date"]).days), "date_start_plan":value["task"].date_start_plan.date()})
+               "diff_day":((self.service_get_begin_date(my_now)-self.service_get_begin_date(value["max_date"])).days), 
+               "date_start_plan":None if value["task"].date_start_plan is None else value["task"].date_start_plan.date()})
       temp_list_track.sort(key=lambda time_track:time_track.get("max_date"), reverse=True)
 
       array_of_all_task = [elem for elem in dic_of_task["task_all"] if elem.date_start_plan and elem.date_start_plan.date() <= my_now.date() and
@@ -62,22 +68,24 @@ class TestWorkPlaceView:
                elem.is_active and 
                (clien_filter_id is None or elem.client.id == clien_filter_id) and elem.client.is_active and 
                (task_name is None or task_name in elem.name) and 
-               elem not in set_of_plan_task_wich_time_track]
+               elem not in set_of_plan_task_wich_time_track
+               and not elem.is_delete]
       array_of_all_task.sort(key=lambda task: task.date_start_plan, reverse=True)
 
       for task in array_of_all_task:
          list_of_result.append({"task_id":task.id, "max_date":None, "task_name":task.name, "task_is_acitve":task.is_active, 
                "client_name":task.client.name, "client_id":task.client.id, "task_duration":0,
-               "diff_day":((my_now-task.date_start_plan).days), "date_start_plan":task.date_start_plan.date()})
+               "diff_day":((self.service_get_begin_date(my_now)-self.service_get_begin_date(task.date_start_plan)).days), "date_start_plan":task.date_start_plan.date()})
 
 
       list_of_result.extend(temp_list_track)
       for elem in list_of_result:
+         elem_date = dic_of_timet_track.get(elem.get("task_id"))
          elem['is_plan'] = False
          elem['is_outdate'] = False
-         if elem['date_start_plan'] is not None and elem["task_duration"] < 100:
+         if elem['date_start_plan'] is not None and elem_date["duration_after_plan"] < 100:
             elem['is_plan'] = True
-            if elem["date_start_plan"] < datetime.today().date() and elem["task_duration"] < 100:
+            if elem["date_start_plan"] < datetime.today().date() and elem_date["duration_after_plan"] < 100:
                elem['is_outdate'] = True
              
       return list_of_result[:count_last_tasks]
@@ -85,9 +93,9 @@ class TestWorkPlaceView:
    @pytest.mark.django_db
    @pytest.mark.parametrize("curr_user, count_elem, task_name, my_client", [
       (pytest.lazy_fixture("user_1"),None,None,None),
-      (pytest.lazy_fixture("user_1"),None,"Is active True, client client 2 inactive, user",None),
-      (pytest.lazy_fixture("user_1"),None,"Is active True, client client 2 inactive, user user_2, date plan None",pytest.lazy_fixture("client_1")),
-      (pytest.lazy_fixture("user_2"),None,"Is active True, client client 2 inactive, user user_2, date plan None",pytest.lazy_fixture("client_1")),
+      (pytest.lazy_fixture("user_1"),None,"act.1, client client 1",None),
+      (pytest.lazy_fixture("user_1"),None,"act.1, client client 1, user user_2",pytest.lazy_fixture("client_1")),
+      (pytest.lazy_fixture("user_2"),None,"act.1, client client 1, user user_2, date plan None, del.0",pytest.lazy_fixture("client_1")),
       (pytest.lazy_fixture("user_1"),None,None,pytest.lazy_fixture("client_1")),
       (pytest.lazy_fixture("user_1"),None,None,pytest.lazy_fixture("client_1")),
       (pytest.lazy_fixture("user_1"),None,None,pytest.lazy_fixture("client_1")),

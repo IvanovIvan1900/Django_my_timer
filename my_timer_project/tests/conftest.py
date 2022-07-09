@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 import uuid
 from datetime import timedelta
 import pytest
@@ -86,6 +87,7 @@ def task_1_user_1(db, user_1:User, client_1:Clients, date_today:datetime.datetim
         "created_at":date_today,
         "user":user_1,
         "date_start_plan":date_today,
+        "is_delete": False,
     }
     return Tasks.objects.create(**dic_of_data)
 
@@ -99,8 +101,18 @@ def task_2_user_2(db, user_2:User, client_1:Clients, date_today:datetime.datetim
         "created_at":date_today,
         "user":user_2,
         "date_start_plan":date_today,
+        "is_delete": False,
     }
     return Tasks.objects.create(**dic_of_data)
+
+def get_is_true(value:bool)->str:
+    return "1" if value else "0"
+
+def get_name_task(dic_of_data:dict, add_name:Optional[str] = None):
+    if add_name is None:
+        return f"""act.{get_is_true(dic_of_data["is_active"])}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}, del.{get_is_true(dic_of_data["is_delete"])}"""
+    else:
+        return f"""Name "{add_name}". Act. {get_is_true(dic_of_data["is_active"])}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]},del. {get_is_true(dic_of_data["is_delete"])}"""
 
 @pytest.fixture
 def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_inactive:Clients, date_today:datetime.datetime, date_yesterday:datetime.datetime,
@@ -123,8 +135,9 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_today,
         "user":user_1,
         "date_start_plan":date_today,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
+    dic_of_data["name"] = get_name_task(dic_of_data) 
     task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_plan_today"].append(task)
     dic_of_result["task_all"].append(task)
@@ -137,9 +150,10 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_today,
         "user":user_1,
         "date_start_plan":date_today,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
-    dic_of_data["name"] = dic_of_data["name"]+"1"
+    dic_of_data["name"] = get_name_task(dic_of_data, "1")
+    # dic_of_data["name"] = dic_of_data["name"]+"1"
     task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_plan_today"].append(task)
     dic_of_result["task_all"].append(task)
@@ -152,8 +166,9 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_today,
         "user":user_1,
         "date_start_plan":date_today,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
+    dic_of_data["name"] = get_name_task(dic_of_data, "2")
     dic_of_data["name"] = dic_of_data["name"]+"2"
     task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_plan_today"].append(task)
@@ -167,9 +182,12 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_yesterday,
         "user":user_1,
         "date_start_plan":date_yesterday,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
+    dic_of_data["name"] = get_name_task(dic_of_data)
     task = Tasks.objects.create(**dic_of_data)
+    dic_of_result["task_plan_yesterday"].append(task)
+    dic_of_data["name"] = get_name_task(dic_of_data, "2")
     dic_of_result["task_plan_yesterday"].append(task)
     dic_of_result["task_all"].append(task)
 
@@ -181,8 +199,9 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_tomorrow,
         "user":user_1,
         "date_start_plan":date_tomorrow,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
+    dic_of_data["name"] = get_name_task(dic_of_data)
     task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_plan_tomorrow"].append(task)
     dic_of_result["task_all"].append(task)
@@ -195,8 +214,9 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_tomorrow,
         "user":user_1,
         "date_start_plan":None,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
+    dic_of_data["name"] = get_name_task(dic_of_data)
     task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_wichout_plan"].append(task)
     dic_of_result["task_all"].append(task)
@@ -209,8 +229,9 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_tomorrow,
         "user":user_2,
         "date_start_plan":None,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
+    dic_of_data["name"] = get_name_task(dic_of_data)
     task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_wichout_plan"].append(task)
     dic_of_result["task_all"].append(task)
@@ -223,10 +244,25 @@ def task_list_of_task(db, user_1:User, user_2:User, client_1:Clients, client_2_i
         "created_at":date_tomorrow,
         "user":user_2,
         "date_start_plan":None,
+        "is_delete": False,
     }
-    dic_of_data["name"] = f'Is active {dic_of_data["is_active"]}, client {dic_of_data["client"]}, user {dic_of_data["user"]}, date plan {dic_of_data["date_start_plan"]}'
+    dic_of_data["name"] = get_name_task(dic_of_data)
     task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_wichout_plan"].append(task)
+    dic_of_result["task_all"].append(task)
+
+    dic_of_data = {
+        "name":"Test task list 5. Active",
+        "is_active":True,
+        "client":client_2_inactive,
+        "description":"Desctiption test task. Task is active",
+        "created_at":date_tomorrow,
+        "user":user_2,
+        "date_start_plan":None,
+        "is_delete": True,
+    }
+    dic_of_data["name"] = get_name_task(dic_of_data)
+    task = Tasks.objects.create(**dic_of_data)
     dic_of_result["task_all"].append(task)
 
     return dic_of_result
@@ -243,6 +279,7 @@ def get_list_of_time_tracker(db, task_list_of_task:dict, date_today: datetime.da
         "date_stop": date_stop,
         "user": task_list_of_task["task_plan_today"][0].user,
         "is_active": False,
+        "is_delete": False,
     }
     list_out.append(TimeTrack.objects.create(**dic_of_data))
 
@@ -251,6 +288,9 @@ def get_list_of_time_tracker(db, task_list_of_task:dict, date_today: datetime.da
     dic_of_data["date_start"] = dic_of_data["date_start"]-timedelta(minutes=10)
     dic_of_data["is_active"] = True
     list_out.append(TimeTrack.objects.create(**dic_of_data))
+    dic_of_data["is_delete"] = True
+    list_out.append(TimeTrack.objects.create(**dic_of_data))
+    dic_of_data["is_delete"] = False
 
     dic_of_data["task"] = task_list_of_task["task_plan_today"][2]
     dic_of_data["user"] = dic_of_data["task"].user
@@ -271,6 +311,10 @@ def get_list_of_time_tracker(db, task_list_of_task:dict, date_today: datetime.da
     dic_of_data["date_stop"] = dic_of_data["date_stop"]-timedelta(minutes=10)
     list_out.append(TimeTrack.objects.create(**dic_of_data))
 
+    dic_of_data["is_delete"] = True
+    list_out.append(TimeTrack.objects.create(**dic_of_data))
+    dic_of_data["is_delete"] = False
+
     list_inactive_task = [task for task in task_list_of_task["task_all"] if not task.is_active]
     if len(list_inactive_task) > 0:
         dic_of_data["task"] =list_inactive_task[0]
@@ -282,6 +326,9 @@ def get_list_of_time_tracker(db, task_list_of_task:dict, date_today: datetime.da
         dic_of_data["task"] =list_inactive_task[len(list_inactive_task)-1]
         dic_of_data["user"] = dic_of_data["task"].user
         list_out.append(TimeTrack.objects.create(**dic_of_data))
+        dic_of_data["is_delete"] = True
+        list_out.append(TimeTrack.objects.create(**dic_of_data))
+        dic_of_data["is_delete"] = False
 
     list_user_2_task = [task for task in task_list_of_task["task_all"] if task.user == user_2]
     if len(list_user_2_task) > 0:
@@ -296,5 +343,26 @@ def get_list_of_time_tracker(db, task_list_of_task:dict, date_today: datetime.da
         # dic_of_data["task"] =list_user_2_task[0]
         dic_of_data["user"] = dic_of_data["task"].user
         list_out.append(TimeTrack.objects.create(**dic_of_data))
+        dic_of_data["is_delete"] = True
+        list_out.append(TimeTrack.objects.create(**dic_of_data))
+        dic_of_data["is_delete"] = False
+    
+    # task plan and time work
+    dic_of_data["task"] = task_list_of_task["task_plan_yesterday"][0]
+    dic_of_data["user"] = dic_of_data["task"].user    
+    dic_of_data["date_start"] = dic_of_data["task"].date_start_plan-timedelta(hours=10, minutes=10)
+    dic_of_data["date_stop"] = dic_of_data["date_start"] + timedelta(hours=1, minutes=10)
+    list_out.append(TimeTrack.objects.create(**dic_of_data))
+
+    dic_of_data["user"] = dic_of_data["task"].user    
+    dic_of_data["date_start"] = dic_of_data["task"].date_start_plan+timedelta(hours=1, minutes=10)
+    dic_of_data["date_stop"] = dic_of_data["date_start"] + timedelta(hours=1, minutes=10)
+    list_out.append(TimeTrack.objects.create(**dic_of_data))
+
+    dic_of_data["task"] = task_list_of_task["task_plan_yesterday"][1]
+    dic_of_data["user"] = dic_of_data["task"].user    
+    dic_of_data["date_start"] = dic_of_data["task"].date_start_plan-timedelta(hours=10, minutes=10)
+    dic_of_data["date_stop"] = dic_of_data["date_start"] + timedelta(hours=1, minutes=10)
+    list_out.append(TimeTrack.objects.create(**dic_of_data))
 
     return list_out

@@ -325,13 +325,19 @@ def work_place(request):
             query_task = query_task.filter(client__id=clien_filter_id)
         query_task = query_task.values("pk")
 
-        time_track_query = TimeTrack.objects.filter(task__id__in=query_task).filter(is_delete=False).values("task__id").order_by().annotate(date_max=Max("date_stop"),
-                duration=Sum("duration_sec"),is_plan=Value(0)).values("task_id", "date_max", "duration", "is_plan")
+        # time_track_duration_after_plan = TimeTrack.objects.filter(task__date_start_plan__lte=date_now).filter(date_stop__gte=F('task__date_start_plan'))
+        #             .annotate()
+
+        time_track_query = TimeTrack.objects.filter(task__id__in=query_task).filter(is_delete=False).filter(user=user).values("task__id").order_by().annotate(date_max=Max("date_stop"),
+                duration=Sum("duration_sec"),is_plan=Value(0), 
+                duration_after_plan=Sum("duration_sec", filter=(Q(task__date_start_plan__lte=date_now)&
+                Q(date_stop__gte=F('task__date_start_plan'))))).values("task_id",
+                 "date_max", "duration", "is_plan", "duration_after_plan")
         
         time_track_id_exist = TimeTrack.objects.filter(is_delete=False).values("task__id").distinct()
 
         qery_task_plan = Tasks.objects.filter(is_active=True,user=user, date_start_plan__lte=date_now, id__in=query_task).exclude(id__in=time_track_id_exist).filter(is_delete=False).annotate(task_id=F('id'), 
-                date_max=F('date_start_plan'), duration=Value(0), is_plan=Value(1)).values("task_id", "date_max", "duration", "is_plan")
+                date_max=F('date_start_plan'), duration=Value(0), is_plan=Value(1), duration_after_plan=Value(0)).values("task_id", "date_max", "duration", "is_plan", "duration_after_plan")
         
         union_query = time_track_query.union(qery_task_plan).order_by("-is_plan", "-date_max")[:count_last_tasks]
         # т.к. join не поддерживается django orm, будем просто получать доп данные, вторым запросом.
@@ -356,9 +362,9 @@ def work_place(request):
             dic_of_data['diff_day'] = ''
             dic_of_data['is_plan'] = False
             dic_of_data['is_outdate'] = False
-            if temp_task.date_start_plan is not None and dic_of_data["task_duration"] < 100:
+            if temp_task.date_start_plan is not None and (elem["duration_after_plan"] is None or elem["duration_after_plan"] < 100):
                 dic_of_data['is_plan'] = True
-                if dic_of_data["date_start_plan"] < datetime.date.today() and dic_of_data["task_duration"] < 100:
+                if dic_of_data["date_start_plan"] < datetime.date.today():
                     dic_of_data['is_outdate'] = True
 
             if elem['date_max'] is not None:

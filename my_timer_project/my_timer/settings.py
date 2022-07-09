@@ -171,10 +171,12 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'cache1',
+        'TIMEOUT': 18000,
     },
     'mem_cache': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'cache2',
+        'TIMEOUT': 18000,
     }
 }
 # Internationalization

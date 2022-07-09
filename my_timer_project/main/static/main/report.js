@@ -143,8 +143,33 @@ function report_service_get_file_pdf(settings, file_name) {
             link.click();
         }
     });
-
 }
+
+function report_service_set_date_account(settings) {
+    $.ajax({
+        type: "GET",
+        // dataType: 'native',
+        url: "/api/reports/set_date_account/",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        xhrFields: {
+            responseType: 'text'
+        },
+        data: settings,
+        cache: false,
+        traditional: true,
+        success: function(text) {
+            let a = 4;
+            window.location.href = text;
+            // var link = document.createElement('a');
+            // link.href = window.URL.createObjectURL(blob);
+            // link.download = file_name;
+            // link.click();
+        }
+    });
+}
+
 
 function report_service_get_file_name_for_client(client_id, date_start, date_stop) {
     let client_name = dict_convert_client_id_to_name[client_id];
@@ -153,6 +178,8 @@ function report_service_get_file_name_for_client(client_id, date_start, date_sto
     let file_name = "report_" + client_name.replaceAll(" ", "_") + "_from_" + date_start_str + "_to_" + date_stop_str + ".pdf"
     return file_name
 }
+
+
 
 function report_save_pdf() {
     let dic_of_settings_temp = settings_collect();
@@ -170,6 +197,48 @@ function report_save_pdf() {
         dic_of_settings["task_id_array_str"] = dic_client_tasks[client_id] + ","; // convert to str, else not working
         report_service_get_file_pdf(dic_of_settings,
             report_service_get_file_name_for_client(client_id, dic_of_settings["date_start"], dic_of_settings["date_stop"]));
+    }
+}
+
+// function report_set_date_account() {
+//     let dic_of_settings_temp = settings_collect();
+//     let dic_of_settings = {}
+//     dic_of_settings["date_start"] = dic_of_settings_temp["date_start"];
+//     dic_of_settings["date_stop"] = dic_of_settings_temp["date_stop"];
+//     dic_of_settings["task_id_array"] = [];
+//     dic_of_settings["only_wichout_account"] = dic_of_settings_temp["only_wichout_account"];
+//     dic_of_settings["set_date_account"] = "true";
+//     dic_of_settings["client_id"] = dic_of_settings_temp["client_id"];
+//     dic_of_settings["task_name"] = dic_of_settings_temp["task_name"];
+//     let dic_client_tasks = report_service_get_check_tasks();
+//     for (let client_id of Object.keys(dic_client_tasks)) {
+//         // let dict = {}
+//         // let arr = dic_client_tasks[client_id]
+//         // arr.forEach((el, index) => dict[arr.length - index] = el);
+//         dic_of_settings["task_id_array_str"] = dic_client_tasks[client_id] + ","; // convert to str, else not working
+//         report_service_get_file_pdf(dic_of_settings,
+//             report_service_get_file_name_for_client(client_id, dic_of_settings["date_start"], dic_of_settings["date_stop"]));
+//     }
+// }
+
+function mark_as_account() {
+    let dic_of_settings_temp = settings_collect();
+    let dic_of_settings = {}
+    dic_of_settings["date_start"] = dic_of_settings_temp["date_start"];
+    dic_of_settings["date_stop"] = dic_of_settings_temp["date_stop"];
+    dic_of_settings["task_id_array"] = [];
+    dic_of_settings["only_wichout_account"] = dic_of_settings_temp["only_wichout_account"];
+    dic_of_settings["set_date_account"] = "true";
+    dic_of_settings["client_id"] = dic_of_settings_temp["client_id"];
+    dic_of_settings["task_name"] = dic_of_settings_temp["task_name"];
+    dic_of_settings["redirect"] = "true";
+    let dic_client_tasks = report_service_get_check_tasks();
+    for (let client_id of Object.keys(dic_client_tasks)) {
+        // let dict = {}
+        // let arr = dic_client_tasks[client_id]
+        // arr.forEach((el, index) => dict[arr.length - index] = el);
+        dic_of_settings["task_id_array_str"] = dic_client_tasks[client_id] + ","; // convert to str, else not working
+        report_service_set_date_account(dic_of_settings);
     }
 }
 
@@ -205,6 +274,11 @@ $(document).ready(function() {
     $('#btnSavePDF').on('click', function() {
         report_save_pdf();
     });
+    $('#btnSetDateAccount').on('click', function() {
+        mark_as_account();
+    });
+
+
     // период формирования
     $('input[name="period"]').daterangepicker({
         opens: 'left',
