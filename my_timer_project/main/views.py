@@ -1,6 +1,7 @@
 import datetime
 from asyncio import Task
 from datetime import datetime as dt
+from operator import itemgetter
 
 import pytz
 # from .forms import FormTestWidget
@@ -359,7 +360,7 @@ def work_place(request):
             dic_of_data["client_id"] = temp_task.client.id
             dic_of_data["task_duration"] = elem.get("duration")
             dic_of_data["date_start_plan"] = temp_task.date_start_plan
-            dic_of_data['diff_day'] = ''
+            dic_of_data['diff_day'] = 0
             dic_of_data['is_plan'] = False
             dic_of_data['is_outdate'] = False
             if temp_task.date_start_plan is not None and (elem["duration_after_plan"] is None or elem["duration_after_plan"] < 100):
@@ -373,6 +374,7 @@ def work_place(request):
                 if max_date:
                     dic_of_data['diff_day'] = (tz.now().date() - max_date.date()).days
             array_of_result.append(dic_of_data)
+        array_of_result.sort(key=lambda elem:(not elem['is_plan'], elem['diff_day']))
         # if not clien_filter_id:
         #     clien_filter_id = None
         # dic_of_data = {}

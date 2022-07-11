@@ -1,5 +1,6 @@
 import collections
 from datetime import datetime, time
+from operator import itemgetter
 import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -87,7 +88,7 @@ class TestWorkPlaceView:
             elem['is_plan'] = True
             if elem["date_start_plan"] < datetime.today().date() and elem_date["duration_after_plan"] < 100:
                elem['is_outdate'] = True
-             
+      list_of_result.sort(key=lambda elem:(not elem['is_plan'], elem['diff_day']))
       return list_of_result[:count_last_tasks]
 
    @pytest.mark.django_db
