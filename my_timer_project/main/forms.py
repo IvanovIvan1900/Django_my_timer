@@ -23,6 +23,11 @@ class FormChangeClient(forms.ModelForm):
 class SearchForm(forms.Form):
     keyword = forms.CharField(required=False, max_length=30, label='')
 
+class FormTasksFilter(forms.Form):
+    task_name = forms.CharField(max_length=100, label='Задача', required= False, widget=forms.TextInput(attrs={'style':'width:500px'}))
+    client = forms.ModelChoiceField(queryset=get_qery_client_wich_cahce(Clients), widget=ClientWidget(), label='Клиент', required= False)
+    only_active = forms.BooleanField(label="Активные", required=False)
+
 class FormChangeTask(forms.ModelForm):
     date_start_plan = forms.DateField(required=False,
          label='Дата начала (План)', widget=DAV_DataFieldWidget(), input_formats=("%d.%m.%Y",))

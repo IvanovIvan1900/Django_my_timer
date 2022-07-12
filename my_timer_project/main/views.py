@@ -24,7 +24,8 @@ from django.views.generic.edit import CreateView, ProcessFormView, UpdateView
 
 from .forms import (FormChangeClient, FormChangeTask, FormCommentEdit,
                     FormNewTask, FormTameTrackerFilter, FormWokrPlaceFilter,
-                    FromChangeTimeTracker, SearchForm)
+                    FromChangeTimeTracker, SearchForm, FormTasksFilter)
+
 from .models import Clients, Comments, Tasks, TimeTrack
 from .pref import Pref
 from .utility import count_active_task_add, count_active_task_minus, date_convert_from_string, date_end_of_day, log_exception
@@ -98,27 +99,57 @@ def client_delete(request, client_id = ""):
 @log_exception(None)
 @login_required
 def task_list(request):
-    keyword = request.GET.get('keyword', '')
+    cache_key_filter = 'task_list_cache_filter'
+    timeout_cache = None
+    filter_list = ['task_name', 'only_active', 'client']
     type_of_filter = request.GET.get('search_button', "")
-    if type_of_filter == "clear_search":
-        keyword = ''
-    request.session['tasks_filter'] = keyword
-    tasks_filter = request.session.get('tasks_filter', "")
-    if tasks_filter:
-        #icontains not workin for sqlite
-        q = Q(name__icontains = tasks_filter.strip()) | \
-            Q(client__name__icontains = tasks_filter.strip())
-        # q = Q(name__icontains = client_filter.strip())
-        tasks = Tasks.objects.filter(q).select_related().all()
+    if type_of_filter:
+        if type_of_filter == 'clear_search':
+            dic_of_filter = dict.fromkeys(filter_list)
+        else:
+            dic_of_filter = {key: request.GET.get(key, None) for key in filter_list}
+        caches['mem_cache'].set(cache_key_filter, dic_of_filter, timeout=timeout_cache)
+    else:
+        dic_of_filter = caches['mem_cache'].get(cache_key_filter, None)
+        if dic_of_filter is None:
+            dic_of_filter = dict.fromkeys(filter_list)
+            caches['mem_cache'].set(cache_key_filter, dic_of_filter, timeout=timeout_cache)
+
+
+    array_list_of_q = []
+    for key, value in dic_of_filter.items():
+        if value and value is not None:
+            if key == "only_active" and dic_of_filter[key]:
+                dic_of_filter[key] = value == "on"
+                # array_list_of_q.append(Q(date_stop__gte=dic_of_filter[key].astimezone(pytz.UTC)))
+                array_list_of_q.append(Q(is_active=dic_of_filter[key]))
+            elif key == "task_name":
+                array_list_of_q.append(Q(name__icontains=value))
+            elif key == "client" and dic_of_filter[key]:
+                dic_of_filter[key] = get_object_or_404(Clients, pk=value)
+                array_list_of_q.append(Q(client__name__icontains=dic_of_filter[key]))
+                # dic_of_filter[key] = Clients.id
+    q = None
+    if len(array_list_of_q):
+        for q_ in array_list_of_q:
+            if q is None:
+                q = q_
+            else:
+                q = q_ & q
+    if q is not None:
+        tasks = Tasks.objects.select_related().filter(q).all()
     else:
         tasks = Tasks.objects.select_related().all()
+
     paginator = Paginator(tasks, Pref.get_pref_by_name('task_count_item_on_page', 10))
     if 'page' in request.GET:
         page_num = request.GET['page']
     else:
         page_num = 1
     page = paginator.get_page(page_num)
-    form_search = SearchForm(initial={'keyword': keyword})
+
+    initial_dic = {key: value for (key, value) in dic_of_filter.items() if value and value is not None}
+    form_search = FormTasksFilter(initial=initial_dic)    
     context = {'tasks': page.object_list, 'form_search':form_search, 'page':page}
     return render(request, 'my_timer_main/main/task_list.html', context)
 
@@ -447,7 +478,7 @@ def work_place(request):
 
     array_dic_of_data_last_tasks = get_last_task(Pref.get_pref_by_name('work_place_count_last_task', 10), dic_of_filter['client'].id if dic_of_filter['client'] else None,
             dic_of_filter['task_name'], request.user, date_now=dt.today())
-    active_time_treket = TimeTrack.objects.filter(is_active = True).order_by('-date_start')
+    active_time_treket = TimeTrack.objects.select_related().filter(is_active = True).order_by('-date_start')
 
     # keyword  = ''
     # form_search = SearchForm(initial={'keyword': keyword})

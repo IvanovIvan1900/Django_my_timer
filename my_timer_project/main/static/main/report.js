@@ -44,6 +44,7 @@ function tree_load_data_to_tree(data) {
     for (client of data.array_of_client) {
         children = []
         client_id = ""
+        duration_client = 0
         for (task of data.dic_of_task[client]) {
             children.push({
                 text: "" + task["task_name"] + " потрачено (" +
@@ -52,9 +53,11 @@ function tree_load_data_to_tree(data) {
             });
             client_id = task["client_id"];
             dcit_convert_id_to_parent["t_" + task["task_id"]] = "c_" + client_id;
+            duration_client = duration_client + task["duration"]
         }
         dict_convert_client_id_to_name["c_" + client_id] = client;
-        dic_data_of_client = { text: client, checked: true, id: "c_" + client_id, children: children }
+        client_text = client + " потрачено (" + seconds_to_hh_mm(duration_client) + " ч. м.)"
+        dic_data_of_client = { text: client_text, checked: true, id: "c_" + client_id, children: children }
         data_source.push(dic_data_of_client)
     }
     // tree_object.dataSource = data_source;
@@ -283,10 +286,13 @@ $(document).ready(function() {
     $('input[name="period"]').daterangepicker({
         opens: 'left',
         showDropdowns: true,
+        startDate: moment().startOf('month'),
+        endDate: moment().endOf('month'),
         ranges: {
             'Сегодня': [moment(), moment()],
             'Текущий месяц': [moment().startOf('month'), moment().endOf('month')],
-            'Предыдущий месяц': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            'Предыдущий месяц': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'Год с текущей даты': [moment().subtract(12, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
         alwaysShowCalendars: true,
         locale: {
